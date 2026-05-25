@@ -1,0 +1,44 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/39"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 39;
+
+    protected override string ProblemTitle => "Integer Right Triangles";
+
+    protected override string Description => "<p>If $p$ is the perimeter of a right angle triangle with integral length sides, $\\\\{a, b, c\\\\}$, there are exactly three solutions for $p = 120$.</p>\n<p>$\\\\{20,48,52\\\\}$, $\\\\{24,45,51\\\\}$, $\\\\{30,40,50\\\\}$</p>\n<p>For which value of $p \\\\le 1000$, is the number of solutions maximised?</p>";
+
+    protected override string Explanation => "We iterate over all perimeters $p$ from 1 to 1000. For each $p$, we check integer sides $a$ and $b$ such that $c = \\\\sqrt{a^2 + b^2}$ and $a + b + c = p$. We count solutions for each $p$ and find the $p$ with the maximum count.";
+
+    protected override long Resolve()
+    {
+        int maxP = 0;
+        int maxCount = 0;
+
+        for (int p = 12; p <= 1000; p++)
+        {
+            int count = 0;
+            for (int a = 1; a < p / 3; a++)
+            {
+                // b = (p^2 - 2pa) / (2p - 2a)
+                if ((p * p - 2 * p * a) % (2 * p - 2 * a) == 0)
+                {
+                    count++;
+                }
+            }
+            if (count > maxCount)
+            {
+                maxCount = count;
+                maxP = p;
+            }
+        }
+        return maxP;
+    }
+}
+
+

@@ -1,0 +1,43 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Collections.Generic
+@using Projecteuler
+@page "/problem/5"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 5;
+
+    protected override string ProblemTitle => "Smallest Multiple";
+
+    protected override string Description => "2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.\n\nWhat is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?";
+
+    protected override string Explanation => "We compute the Least Common Multiple (LCM) of all numbers from 1 to 20. The LCM of two numbers can be calculated using the formula: LCM(a,b) = (a * b) / GCD(a,b). We iteratively compute the LCM of the range.";
+
+    protected override long Resolve()
+    {
+        return Enumerable.Range(1, 20).Aggregate(1L, (lcm, i) => Lcm(lcm, i));
+    }
+
+    private long Gcd(long a, long b)
+    {
+        while (b != 0)
+        {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    private long Lcm(long a, long b)
+    {
+        return (a * b) / Gcd(a, b);
+    }
+}
+
+

@@ -1,0 +1,62 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/49"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 49;
+
+    protected override string ProblemTitle => "Prime Permutations";
+
+    protected override string Description => "<p>The arithmetic sequence, $1487, 4817, 8147$, in which each of the terms increases by $3330$, is unusual in two ways: (i) each of the three terms are prime, and, (ii) each of the $4$-digit numbers are permutations of one another.</p>\n<p>There are no arithmetic sequences made up of three $1$-, $2$-, or $3$-digit primes, exhibiting this property, but there is one other $4$-digit increasing sequence.</p>\n<p>What $12$-digit number do you form by concatenating the three terms in this sequence?</p>";
+
+    protected override string Explanation => "We iterate through 4-digit primes $p$. For each $p$, we check if $p + 3330$ and $p + 6660$ are also prime and are permutations of $p$. We skip $p = 1487$ since it's the example provided.";
+
+    protected override long Resolve()
+    {
+        bool[] isPrime = Sieve(10000);
+        for (int p = 1488; p < 10000 - 6660; p++)
+        {
+            if (isPrime[p])
+            {
+                int p2 = p + 3330;
+                int p3 = p + 6660;
+                if (isPrime[p2] && isPrime[p3] && IsPermutation(p, p2) && IsPermutation(p, p3))
+                {
+                    return long.Parse($"{p}{p2}{p3}");
+                }
+            }
+        }
+        return 0;
+    }
+
+    private bool[] Sieve(int limit)
+    {
+        bool[] isPrime = new bool[limit];
+        Array.Fill(isPrime, true);
+        isPrime[0] = isPrime[1] = false;
+        for (int p = 2; p * p < limit; p++)
+        {
+            if (isPrime[p])
+            {
+                for (int i = p * p; i < limit; i += p)
+                    isPrime[i] = false;
+            }
+        }
+        return isPrime;
+    }
+
+    private bool IsPermutation(int a, int b)
+    {
+        char[] ca = a.ToString().ToCharArray();
+        char[] cb = b.ToString().ToCharArray();
+        Array.Sort(ca);
+        Array.Sort(cb);
+        return new string(ca) == new string(cb);
+    }
+}
+
+

@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Components.Routing
+@namespace Projecteuler.Components
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <RazorConsole.Components.Markup Content="Sorry, there's nothing at this address." />
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+}

@@ -1,0 +1,120 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@using System.Reflection
+@using Projecteuler.Components.Problems
+@namespace Projecteuler.Components
+
+<Rows>
+    <Figlet Content="Project Euler"  Color="Color.Blue" />
+    <Newline />
+
+    <Panel Title="Problem Selector" Border="BoxBorder.Rounded" Expand="true">
+        <Rows>
+            <Select  Options="@_pagedOptions"
+                     Value="@SelectedTitle"
+                     ValueChanged="OnSelectionChangedFromTitle"
+                     Placeholder=" Choose a problem "></Select>
+            <Newline />
+            <Columns>
+                <TextButton Content=" Prev "
+                            OnClick="PrevPage"
+                            BackgroundColor="Color.Grey" FocusedColor="Color.Lime" />
+                <Markup Content="@PageDisplay" Foreground="Color.Grey58" />
+                <TextButton Content=" Next "
+                            OnClick="NextPage"
+                            BackgroundColor="Color.Grey" FocusedColor="Color.Lime" />
+            </Columns>
+        </Rows>
+    </Panel>
+    
+    <Newline />
+    @Body
+</Rows>
+
+@code {
+    private Dictionary<string, string> _problemTitles = new();
+    private string[] _problemOptions = Array.Empty<string>();
+    private string[] _pagedOptions = Array.Empty<string>();
+    private string? _selectedRef;
+    private int _pageIndex;
+    private int _pageCount;
+    private const int PageSize = 10;
+
+    protected override void OnInitialized()
+    {
+        var problems = new List<(int Id, string Title)>();
+        
+        var problemTypes = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => t.IsSubclassOf(typeof(ProblemBase)) && !t.IsAbstract);
+
+        foreach (var type in problemTypes)
+        {
+            try 
+            {
+                var instance = Activator.CreateInstance(type);
+                
+                var refProp = type.GetProperty("Ref", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                var titleProp = type.GetProperty("ProblemTitle", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+                if (refProp == null || titleProp == null) continue;
+                var id = (int)refProp.GetValue(instance)!;
+                var title = (string)titleProp.GetValue(instance)!;
+                problems.Add((id, title));
+            }
+            catch
+            {
+                // Ignore types that cannot be instantiated
+            }
+        }
+
+        var sortedProblems = problems.OrderBy(p => p.Id).ToList();
+
+        _problemTitles = sortedProblems.ToDictionary(
+            p => p.Id.ToString(), 
+            p => $"{p.Id}: {p.Title}"
+        );
+
+        _problemOptions = sortedProblems.Select(p => p.Id.ToString()).ToArray();
+        _pageCount = (int)Math.Ceiling(_problemOptions.Length / (double)PageSize);
+        _pageIndex = 0;
+        UpdatePageOptions();
+    }
+
+    private string? SelectedTitle => _selectedRef != null && _problemTitles.ContainsKey(_selectedRef)
+        ? _problemTitles[_selectedRef]
+        : null;
+
+    private string PageDisplay => _pageCount == 0 ? string.Empty : $" Page {_pageIndex + 1} / {_pageCount} ";
+
+    private void OnSelectionChangedFromTitle(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        var idPart = value.Split(':', 2)[0].Trim();
+        _selectedRef = idPart;
+        Navigation.NavigateTo($"/problem/{idPart}");
+    }
+
+    private void PrevPage()
+    {
+        if (_pageIndex <= 0) return;
+        _pageIndex--;
+        UpdatePageOptions();
+    }
+
+    private void NextPage()
+    {
+        if (_pageIndex >= _pageCount - 1) return;
+        _pageIndex++;
+        UpdatePageOptions();
+    }
+
+    private void UpdatePageOptions()
+    {
+        int start = _pageIndex * PageSize;
+        _pagedOptions = _problemOptions
+            .Skip(start)
+            .Take(PageSize)
+            .Select(id => _problemTitles[id])
+            .ToArray();
+    }
+}

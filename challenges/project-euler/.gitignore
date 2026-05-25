@@ -1,0 +1,25 @@
+# Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+
+# Rider / IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python script temporary outputs
+test_problems.md
+
+# Exclude DownloadProblems project from main build
+DownloadProblems/bin/
+DownloadProblems/obj/

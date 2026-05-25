@@ -1,0 +1,37 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using Projecteuler
+@page "/problem/9"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 9;
+
+    protected override string ProblemTitle => "Special Pythagorean Triplet";
+
+    protected override string Description => "A Pythagorean triplet is a set of three natural numbers, a < b < c, for which,\na² + b² = c².\n\nFor example, 3² + 4² = 9 + 16 = 25 = 5².\n\nThere exists exactly one Pythagorean triplet for which a + b + c = 1000.\nFind the product abc.";
+
+    protected override string Explanation => "We iterate through possible values of a and b, ensuring a < b < c and a + b + c = 1000. For each pair, we calculate c = 1000 - a - b and check if a² + b² = c². When found, we return the product a * b * c.";
+
+    protected override long Resolve()
+    {
+        for (int a = 1; a < 1000; a++)
+        {
+            for (int b = a + 1; b < (1000 - a) / 2; b++)
+            {
+                int c = 1000 - a - b;
+                if (a * a + b * b == c * c)
+                {
+                    return a * b * c;
+                }
+            }
+        }
+        return 0;
+    }
+}
+
+

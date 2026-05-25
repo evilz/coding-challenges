@@ -1,0 +1,40 @@
+---
+import type { CatalogItem } from '~/utils/catalog';
+
+interface Props {
+  item: CatalogItem;
+}
+
+const { item } = Astro.props;
+---
+
+<article
+  class="group relative rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+>
+  <div class="mb-4 flex flex-wrap gap-2">
+    {
+      item.languages
+        .slice(0, 4)
+        .map((language) => (
+          <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+            {language}
+          </span>
+        ))
+    }
+  </div>
+
+  <h2 class="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
+    <a class="after:absolute after:inset-0" href={item.href}>{item.title}</a>
+  </h2>
+
+  <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{item.summary}</p>
+
+  <div class="mt-5 flex flex-wrap gap-2">
+    {item.topics.map((topic) => <span class="text-xs text-slate-500 dark:text-slate-400">#{topic}</span>)}
+  </div>
+
+  <div class="mt-6 flex items-center justify-between text-sm">
+    <span class="font-mono text-xs text-slate-500 dark:text-slate-400">{item.repositoryPath}</span>
+    <span class="font-medium text-blue-700 group-hover:text-blue-800 dark:text-blue-300">Open</span>
+  </div>
+</article>

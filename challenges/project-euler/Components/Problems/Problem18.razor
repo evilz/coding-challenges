@@ -1,0 +1,60 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@page "/problem/18"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 18;
+
+    protected override string ProblemTitle => "Maximum Path Sum I";
+
+    protected override string Description => "By starting at the top of the triangle below and moving to adjacent numbers on the row below, the maximum total from top to bottom is 23.\n\n   3\n  7 4\n 2 4 6\n8 5 9 3\n\nThat is, 3 + 7 + 4 + 9 = 23.\n\nFind the maximum total from top to bottom of the triangle below:\n\n75\n95 64\n17 47 82\n18 35 87 10\n20 04 82 47 65\n19 01 23 75 03 34\n88 02 77 73 07 63 67\n99 65 04 28 06 16 70 92\n41 41 26 56 83 40 80 70 33\n41 48 72 33 47 32 37 16 94 29\n53 71 44 65 25 43 91 52 97 51 14\n70 11 33 28 77 73 17 78 39 68 17 57\n91 71 52 38 17 14 91 43 58 50 27 29 48\n63 66 04 68 89 53 67 30 73 16 69 87 40 31\n04 62 98 27 23 09 70 98 73 93 38 53 60 04 23\n\nNOTE: As there are only 16384 routes, it is possible to solve this problem by trying every route. However, Problem 67, is the same challenge with a triangle containing one-hundred rows; it cannot be solved by brute force, and requires a clever method!";
+
+    protected override string Explanation => "We use dynamic programming, working from bottom to top. For each position, we calculate the maximum sum by choosing the larger of the two adjacent values from the row below. This reduces the problem size at each step until we reach the top with the maximum sum.";
+
+    protected override long Resolve()
+    {
+        int[][] triangle = new int[][] {
+            new int[] { 75 },
+            new int[] { 95, 64 },
+            new int[] { 17, 47, 82 },
+            new int[] { 18, 35, 87, 10 },
+            new int[] { 20, 04, 82, 47, 65 },
+            new int[] { 19, 01, 23, 75, 03, 34 },
+            new int[] { 88, 02, 77, 73, 07, 63, 67 },
+            new int[] { 99, 65, 04, 28, 06, 16, 70, 92 },
+            new int[] { 41, 41, 26, 56, 83, 40, 80, 70, 33 },
+            new int[] { 41, 48, 72, 33, 47, 32, 37, 16, 94, 29 },
+            new int[] { 53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14 },
+            new int[] { 70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57 },
+            new int[] { 91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48 },
+            new int[] { 63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31 },
+            new int[] { 04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23 }
+        };
+
+        // Create a copy for dynamic programming
+        int[][] dp = new int[triangle.Length][];
+        for (int i = 0; i < triangle.Length; i++)
+        {
+            dp[i] = new int[triangle[i].Length];
+            Array.Copy(triangle[i], dp[i], triangle[i].Length);
+        }
+
+        // Work from bottom to top
+        for (int row = triangle.Length - 2; row >= 0; row--)
+        {
+            for (int col = 0; col < triangle[row].Length; col++)
+            {
+                dp[row][col] += Math.Max(dp[row + 1][col], dp[row + 1][col + 1]);
+            }
+        }
+
+        return dp[0][0];
+    }
+}
+
+

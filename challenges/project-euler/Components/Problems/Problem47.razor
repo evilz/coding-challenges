@@ -1,0 +1,40 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/47"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 47;
+
+    protected override string ProblemTitle => "Distinct Primes Factors";
+
+    protected override string Description => "<p>The first two consecutive numbers to have two distinct prime factors are:</p>\n$$\\\\begin{align}\n14 &amp;= 2 \\\\times 7\\\n15 &amp;= 3 \\\\times 5.\n\\\\end{align}$$\n<p>The first three consecutive numbers to have three distinct prime factors are:</p>\n$$\\\\begin{align}\n644 &amp;= 2^2 \\\\times 7 \\\\times 23\\\n645 &amp;= 3 \\\\times 5 \\\\times 43\\\n646 &amp;= 2 \\\\times 17 \\\\times 19.\n\\\\end{align}$$\n<p>Find the first four consecutive integers to have four distinct prime factors each. What is the first of these numbers?</p>";
+
+    protected override string Explanation => "We use a sieve-like method to precalculate the number of distinct prime factors for each number up to 1,000,000. Then we scan the array for a sequence of 4 consecutive numbers where each has exactly 4 distinct prime factors.";
+
+    protected override long Resolve()
+    {
+        int limit = 1000000;
+        int[] factors = new int[limit];
+        for (int i = 2; i < limit; i++)
+        {
+            if (factors[i] == 0)
+            {
+                for (int j = i; j < limit; j += i)
+                    factors[j]++;
+            }
+        }
+
+        for (int i = 210; i < limit - 4; i++)
+        {
+            if (factors[i] == 4 && factors[i + 1] == 4 && factors[i + 2] == 4 && factors[i + 3] == 4)
+                return i;
+        }
+        return 0;
+    }
+}
+
+

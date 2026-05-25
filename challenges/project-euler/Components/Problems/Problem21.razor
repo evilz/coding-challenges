@@ -1,0 +1,65 @@
+@namespace Projecteuler.Components.Problems
+@using System
+@page "/problem/21"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 21;
+
+    protected override string ProblemTitle => "Amicable Numbers";
+
+    protected override string Description => "<p>Let $d(n)$ be defined as the sum of proper divisors of $n$ (numbers less than $n$ which divide evenly into $n$).<br>\nIf $d(a) = b$ and $d(b) = a$, where $a \ne b$, then $a$ and $b$ are an amicable pair and each of $a$ and $b$ are called amicable numbers.</p>\n<p>For example, the proper divisors of $220$ are $1, 2, 4, 5, 10, 11, 20, 22, 44, 55$ and $110$; therefore $d(220) = 284$. The proper divisors of $284$ are $1, 2, 4, 71$ and $142$; so $d(284) = 220$.</p>\n<p>Evaluate the sum of all the amicable numbers under $10000$.</p>";
+
+    protected override string Explanation => "We precompute the sum of proper divisors for every number below 10000 using a divisor scan up to $\\\\sqrt{n}$. Then, for each $a$, we compute $b = d(a)$ and check if $b \ne a$ and $d(b)=a$. Summing all such $a$ yields the total of amicable numbers under 10000.";
+
+    protected override long Resolve()
+    {
+        const int limit = 10000;
+        int[] sumDiv = new int[limit];
+
+        for (int n = 1; n < limit; n++)
+        {
+            sumDiv[n] = SumProperDivisors(n);
+        }
+
+        long total = 0;
+        for (int a = 2; a < limit; a++)
+        {
+            int b = sumDiv[a];
+            if (b != a && b < limit && b > 0 && sumDiv[b] == a)
+            {
+                total += a;
+            }
+        }
+
+        return total;
+    }
+
+    private static int SumProperDivisors(int n)
+    {
+        if (n == 1) return 0;
+
+        int sum = 1;
+        int root = (int)Math.Sqrt(n);
+        for (int i = 2; i <= root; i++)
+        {
+            if (n % i == 0)
+            {
+                int other = n / i;
+                sum += i;
+                if (other != i)
+                {
+                    sum += other;
+                }
+            }
+        }
+
+        return sum;
+    }
+}
+
+

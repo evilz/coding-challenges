@@ -1,0 +1,17 @@
+pool:
+  vmImage: 'Ubuntu 16.04'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: sdk
+    includePreviewVersions: true
+    version: '3.x'
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- script: ./CI.sh
+

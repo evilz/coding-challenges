@@ -1,0 +1,26 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/1"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 1;
+
+    protected override string ProblemTitle => "Multiples of 3 or 5";
+
+    protected override string Description => "If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.\n Find the sum of all the multiples of 3 or 5 below 1000.";
+
+    protected override string Explanation => "We iterate through all numbers from 0 to 999 and check if each number is divisible by 3 or 5. If it is, we include it in the sum. The result is the sum of all such multiples.";
+
+    protected override long Resolve()
+    {
+        return Enumerable.Range(0, 1000)
+                .Where(i => i % 3 == 0 || i % 5 == 0)
+                .Sum();
+    }
+}
+
+

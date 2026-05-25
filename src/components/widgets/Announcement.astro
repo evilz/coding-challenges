@@ -1,0 +1,13 @@
+---
+import { getPermalink } from '~/utils/permalinks';
+---
+
+<div class="bg-blue-950 px-3 py-2 text-sm text-white">
+  <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
+    <span>Coding Challenges is a README-backed catalog.</span>
+    <a href={getPermalink('/challenges')} class="font-medium text-slate-200 hover:underline">Browse catalog</a>
+    <a href="https://github.com/evilz/coding-challenges" class="font-medium text-slate-200 hover:underline"
+      >View repository</a
+    >
+  </div>
+</div>

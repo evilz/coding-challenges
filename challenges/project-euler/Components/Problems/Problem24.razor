@@ -1,0 +1,54 @@
+@namespace Projecteuler.Components.Problems
+@using System
+@using System.Collections.Generic
+@page "/problem/24"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 24;
+
+    protected override string ProblemTitle => "Lexicographic Permutations";
+
+    protected override string Description => "<p>A permutation is an ordered arrangement of objects. For example, 3124 is one possible permutation of the digits 1, 2, 3 and 4. If all of the permutations are listed numerically or alphabetically, we call it lexicographic order. The lexicographic permutations of 0, 1 and 2 are:</p>\n<p class=\"center\">012   021   102   120   201   210</p>\n<p>What is the millionth lexicographic permutation of the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?</p>";
+
+    protected override string Explanation => "We use the factorial number system to pick digits. For the millionth permutation (0-based index 999999), we repeatedly select the digit at index $\\\\lfloor k/(n-1)! \\\\rfloor$ from the remaining list and reduce $k$ by the same factor.";
+
+    protected override long Resolve()
+    {
+        const int totalDigits = 10;
+        long target = 1_000_000 - 1; // zero-based index
+
+        long[] factorial = new long[totalDigits + 1];
+        factorial[0] = 1;
+        for (int i = 1; i <= totalDigits; i++)
+        {
+            factorial[i] = factorial[i - 1] * i;
+        }
+
+        List<int> digits = new();
+        for (int i = 0; i < totalDigits; i++)
+        {
+            digits.Add(i);
+        }
+
+        char[] result = new char[totalDigits];
+        for (int pos = totalDigits; pos >= 1; pos--)
+        {
+            long f = factorial[pos - 1];
+            int index = (int)(target / f);
+            target %= f;
+
+            int digit = digits[index];
+            digits.RemoveAt(index);
+            result[totalDigits - pos] = (char)('0' + digit);
+        }
+
+        return long.Parse(new string(result));
+    }
+}
+
+

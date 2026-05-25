@@ -1,0 +1,50 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@page "/problem/14"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 14;
+
+    protected override string ProblemTitle => "Longest Collatz Sequence";
+
+    protected override string Description => "The following iterative sequence is defined for the set of positive integers:\n\nn → n/2 (n is even)\nn → 3n + 1 (n is odd)\n\nUsing the rule above and starting with 13, we generate the following sequence:\n13 → 40 → 20 → 10 → 5 → 16 → 8 → 4 → 2 → 1.\n\nIt can be seen that this sequence (starting at 13 and finishing at 1) contains 10 terms. Although it has not been proved yet (Collatz Problem), it is thought that all starting numbers finish at 1.\n\nWhich starting number, under one million, produces the longest chain?\n\nNOTE: Once the chain starts the terms are allowed to go above one million.";
+
+    protected override string Explanation => "We iterate through all numbers from 1 to 999,999, calculate the Collatz sequence length for each, and track which starting number produces the longest chain. We use memoization to cache previously calculated chain lengths for efficiency.";
+
+    protected override long Resolve()
+    {
+        int maxLength = 0;
+        int numberWithMaxLength = 0;
+        Dictionary<long, int> cache = new Dictionary<long, int>();
+
+        for (int i = 1; i < 1000000; i++)
+        {
+            int length = GetCollatzLength(i, cache);
+            if (length > maxLength)
+            {
+                maxLength = length;
+                numberWithMaxLength = i;
+            }
+        }
+
+        return numberWithMaxLength;
+    }
+
+    private int GetCollatzLength(long n, Dictionary<long, int> cache)
+    {
+        if (n == 1) return 1;
+        if (cache.ContainsKey(n)) return cache[n];
+
+        long next = (n % 2 == 0) ? n / 2 : 3 * n + 1;
+        int length = 1 + GetCollatzLength(next, cache);
+        cache[n] = length;
+        return length;
+    }
+}
+
+

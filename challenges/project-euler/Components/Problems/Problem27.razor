@@ -1,0 +1,71 @@
+@namespace Projecteuler.Components.Problems
+@using System
+@using System.Collections.Generic
+@page "/problem/27"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 27;
+
+    protected override string ProblemTitle => "Quadratic Primes";
+
+    protected override string Description => "<p>Euler discovered the remarkable quadratic formula:</p>\n<p class=\"center\">$n^2 + n + 41$</p>\n<p>It turns out that the formula will produce $40$ primes for the consecutive integer values $0 \\\\le n \\\\le 39$. However, when $n = 40, 40^2 + 40 + 41 = 40(40 + 1) + 41$ is divisible by $41$, and certainly when $n = 41, 41^2 + 41 + 41$ is clearly divisible by $41$.</p>\n<p>The incredible formula $n^2 - 79n + 1601$ was discovered, which produces $80$ primes for the consecutive values $0 \\\\le n \\\\le 79$. The product of the coefficients, $-79$ and $1601$, is $-126479$.</p>\n<p>Considering quadratics of the form:</p>\n<blockquote>\n$n^2 + an + b$, where $|a| &lt; 1000$ and $|b| \\\\le 1000$<br><br><div>where $|n|$ is the modulus/absolute value of $n$<br>e.g. $|11| = 11$ and $|-4| = 4$</div>\n</blockquote>\n<p>Find the product of the coefficients, $a$ and $b$, for the quadratic expression that produces the maximum number of primes for consecutive values of $n$, starting with $n = 0$.</p>";
+
+    protected override string Explanation => "Because $n=0$ yields $b$, $b$ must be a positive prime. We iterate all $a$ in $[-999,999]$ and prime $b \\\\le 1000$, count consecutive primes produced by $n^2 + an + b$, and track the maximum chain. The product $a\\\\times b$ of the best pair is returned.";
+
+    protected override long Resolve()
+    {
+        List<int> primesB = new();
+        for (int b = 2; b <= 1000; b++)
+        {
+            if (IsPrime(b)) primesB.Add(b);
+        }
+
+        int bestA = 0;
+        int bestB = 0;
+        int bestCount = 0;
+
+        for (int a = -999; a <= 999; a++)
+        {
+            foreach (int b in primesB)
+            {
+                int count = 0;
+                while (true)
+                {
+                    int value = count * count + a * count + b;
+                    if (value <= 1 || !IsPrime(value)) break;
+                    count++;
+                }
+
+                if (count > bestCount)
+                {
+                    bestCount = count;
+                    bestA = a;
+                    bestB = b;
+                }
+            }
+        }
+
+        return bestA * bestB;
+    }
+
+    private static bool IsPrime(int n)
+    {
+        if (n < 2) return false;
+        if (n == 2) return true;
+        if (n % 2 == 0) return false;
+        int limit = (int)Math.Sqrt(n);
+        for (int i = 3; i <= limit; i += 2)
+        {
+            if (n % i == 0) return false;
+        }
+
+        return true;
+    }
+}
+
+

@@ -1,0 +1,29 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Numerics
+@page "/problem/16"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 16;
+
+    protected override string ProblemTitle => "Power Digit Sum";
+
+    protected override string Description => "2^15 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.\n\nWhat is the sum of the digits of the number 2^1000?";
+
+    protected override string Explanation => "We use BigInteger to calculate 2^1000, convert it to a string, and sum each digit character by converting it back to its numeric value.";
+
+    protected override long Resolve()
+    {
+        BigInteger power = BigInteger.Pow(2, 1000);
+        string powerStr = power.ToString();
+        
+        return powerStr.Select(c => c - '0').Sum();
+    }
+}
+
+

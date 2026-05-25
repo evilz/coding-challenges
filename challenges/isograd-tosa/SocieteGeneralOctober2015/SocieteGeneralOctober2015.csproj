@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A0A107AA-1A51-4D83-90F8-795DBA53AD39}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SocieteGeneralOctober2015</RootNamespace>
+    <AssemblyName>SocieteGeneralOctober2015</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SocieteGeneralOctober2015._7.FireAlarms.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="2.CardNumberValidation\Program.cs" />
+    <Compile Include="4.HandlingCashRequests\Program.cs" />
+    <Compile Include="1.ClosingBalance\Program.cs" />
+    <Compile Include="3.PeakHours\Program.cs" />
+    <Compile Include="5.CashUsage\Program.cs" />
+    <Compile Include="6.Flooding\Program.cs" />
+    <Compile Include="7.FireAlarms\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="5.CashUsage\README.md" />
+    <None Include="6.Flooding\README.md" />
+    <None Include="7.FireAlarms\README.md" />
+    <None Include="App.config" />
+    <None Include="2.CardNumberValidation\Readme.md" />
+    <None Include="1.ClosingBalance\Readme.md" />
+    <None Include="3.PeakHours\Readme.md" />
+    <None Include="4.HandlingCashRequests\Readme.md" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="1.ClosingBalance\samples\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="2.CardNumberValidation\samples\input1.txt" />
+    <Content Include="2.CardNumberValidation\samples\input2.txt" />
+    <Content Include="2.CardNumberValidation\samples\input3.txt" />
+    <Content Include="2.CardNumberValidation\samples\output1.txt" />
+    <Content Include="2.CardNumberValidation\samples\output2.txt" />
+    <Content Include="2.CardNumberValidation\samples\output3.txt" />
+    <Content Include="3.PeakHours\samples\input1.txt" />
+    <Content Include="3.PeakHours\samples\input2.txt" />
+    <Content Include="3.PeakHours\samples\output1.txt" />
+    <Content Include="3.PeakHours\samples\output2.txt" />
+    <Content Include="4.HandlingCashRequests\samples\input1.txt" />
+    <Content Include="4.HandlingCashRequests\samples\input2.txt" />
+    <Content Include="4.HandlingCashRequests\samples\output1.txt" />
+    <Content Include="4.HandlingCashRequests\samples\output2.txt" />
+    <Content Include="5.CashUsage\samples\input1.txt" />
+    <Content Include="5.CashUsage\samples\input2.txt" />
+    <Content Include="5.CashUsage\samples\output1.txt" />
+    <Content Include="5.CashUsage\samples\output2.txt" />
+    <Content Include="6.Flooding\samples\input1.txt" />
+    <Content Include="6.Flooding\samples\input2.txt" />
+    <Content Include="6.Flooding\samples\output1.txt" />
+    <Content Include="6.Flooding\samples\output2.txt" />
+    <Content Include="7.FireAlarms\samples\input1.txt" />
+    <Content Include="7.FireAlarms\samples\input2.txt" />
+    <Content Include="7.FireAlarms\samples\output1.txt" />
+    <Content Include="7.FireAlarms\samples\output2.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,47 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/42"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@using System.Net.Http
+@code {
+    protected override int Ref => 42;
+
+    protected override string ProblemTitle => "Coded Triangle Numbers";
+
+    protected override string Description => "<p>The $n$<sup>th</sup> term of the sequence of triangle numbers is given by, $t_n = \\\\frac12n(n+1)$; so the first ten triangle numbers are:\n$$1, 3, 6, 10, 15, 21, 28, 36, 45, 55, \\\\dots$$</p>\n<p>By converting each letter in a word to a number corresponding to its alphabetical position and adding these values we form a word value. For example, the word value for SKY is $19 + 11 + 25 = 55 = t_{10}$. If the word value is a triangle number then we shall call the word a triangle word.</p>\n<p>Using <a href=\"resources/documents/0042_words.txt\">words.txt</a> (right click and 'Save Link/Target As...'), a 16K text file containing nearly two-thousand common English words, how many are triangle words?</p>";
+
+    protected override string Explanation => "We fetch the words from the Project Euler website, calculate each word's alphabetical value, and check if that value is a triangle number (a number $x$ is triangular if $\\\\sqrt{8x+1}$ is an integer).";
+
+    protected override long Resolve()
+    {
+        const string url = "https://projecteuler.net/resources/documents/0042_words.txt";
+        using var client = new HttpClient();
+        var contentTask = client.GetStringAsync(url);
+        string content = contentTask.GetAwaiter().GetResult();
+
+        string[] words = content
+            .Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+        int count = 0;
+        foreach (var w in words)
+        {
+            string word = w.Trim().Trim('"');
+            int val = word.Sum(c => c - 'A' + 1);
+            if (IsTriangleNumber(val)) count++;
+        }
+
+        return count;
+    }
+
+    private bool IsTriangleNumber(int n)
+    {
+        double x = (Math.Sqrt(8.0 * n + 1) - 1) / 2;
+        return x == (int)x;
+    }
+}
+
+

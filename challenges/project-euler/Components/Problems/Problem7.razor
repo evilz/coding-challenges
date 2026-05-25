@@ -1,0 +1,58 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Collections.Generic
+@using Projecteuler
+@page "/problem/7"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 7;
+
+    protected override string ProblemTitle => "10 001st Prime";
+
+    protected override string Description => "By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.\n\nWhat is the 10,001st prime number?";
+
+    protected override string Explanation => "We generate prime numbers sequentially using a simple primality test, continuing until we reach the 10,001st prime. Each candidate is checked for divisibility by previously found primes.";
+
+    protected override long Resolve()
+    {
+        return GeneratePrimes().ElementAt(10000);
+    }
+
+    private IEnumerable<long> GeneratePrimes()
+    {
+        yield return 2;
+        var primes = new List<long> { 2 };
+        long candidate = 3;
+        
+        while (true)
+        {
+            bool isPrime = true;
+            long sqrtCandidate = (long)Math.Sqrt(candidate);
+            
+            foreach (var prime in primes)
+            {
+                if (prime > sqrtCandidate) break;
+                if (candidate % prime == 0)
+                {
+                    isPrime = false;
+                    break;
+                }
+            }
+            
+            if (isPrime)
+            {
+                primes.Add(candidate);
+                yield return candidate;
+            }
+            
+            candidate += 2;
+        }
+    }
+}
+
+

@@ -1,0 +1,27 @@
+paml: 0.2.0
+
+info:
+  description: Evilz Code Challenge 2020
+
+resources:
+  LNINamespace:
+    type: "Veepee::OAAS::Namespace"
+    properties:
+      name: sales-creation-vbourdon
+      groupsRO:
+        - leaddeveloper-salesprepa-sresp
+        - developer-salesprepa-sresp
+      groupsRW:
+        - leadsre-salesprepa-sresp
+        - sre-salesprepa-sresp
+      usersRW:
+        - svc_deploy_sp
+        - svc_soucing_ci
+        - vbourdon 
+      usersRO: []
+  EvilzCodeChallenge:
+    type: "Veepee::CS::JobSpec"
+    properties:
+      kind: workloadServer
+      namespace: sales-creation-vbourdon
+      port: 5000

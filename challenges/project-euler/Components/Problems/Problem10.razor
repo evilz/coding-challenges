@@ -1,0 +1,58 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Collections.Generic
+@using Projecteuler
+@page "/problem/10"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 10;
+
+    protected override string ProblemTitle => "Summation of Primes";
+
+    protected override string Description => "The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.\n\nFind the sum of all the primes below two million.";
+
+    protected override string Explanation => "We use the Sieve of Eratosthenes algorithm to efficiently find all prime numbers below 2,000,000. The sieve marks composite numbers, and we sum all remaining primes.";
+
+    protected override long Resolve()
+    {
+        int limit = 2000000;
+        bool[] isPrime = new bool[limit];
+        
+        // Initialize all as prime
+        for (int i = 2; i < limit; i++)
+        {
+            isPrime[i] = true;
+        }
+        
+        // Sieve of Eratosthenes
+        for (int i = 2; i * i < limit; i++)
+        {
+            if (isPrime[i])
+            {
+                for (int j = i * i; j < limit; j += i)
+                {
+                    isPrime[j] = false;
+                }
+            }
+        }
+        
+        // Sum all primes
+        long sum = 0;
+        for (int i = 2; i < limit; i++)
+        {
+            if (isPrime[i])
+            {
+                sum += i;
+            }
+        }
+        
+        return sum;
+    }
+}
+
+

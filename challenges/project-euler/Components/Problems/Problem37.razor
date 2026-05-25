@@ -1,0 +1,63 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/37"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 37;
+
+    protected override string ProblemTitle => "Truncatable Primes";
+
+    protected override string Description => "<p>The number $3797$ has an interesting property. Being prime itself, it is possible to continuously remove digits from left to right, and remain prime at each stage: $3797$, $797$, $97$, and $7$. Similarly we can work from right to left: $3797$, $379$, $37$, and $3$.</p>\n<p>Find the sum of the only eleven primes that are both truncatable from left to right and right to left.</p>\n<p class=\"smaller\">NOTE: $2$, $3$, $5$, and $7$ are not considered to be truncatable primes.</p>";
+
+    protected override string Explanation => "We use a sieve to find primes up to 1,000,000. For each prime greater than 10, we check if all its left and right truncations are also prime. We stop once we find exactly 11 such primes.";
+
+    protected override long Resolve()
+    {
+        int limit = 1000000;
+        bool[] isPrime = Sieve(limit);
+        long sum = 0;
+        int count = 0;
+        for (int i = 10; i < limit && count < 11; i++)
+        {
+            if (isPrime[i] && IsTruncatable(i, isPrime))
+            {
+                sum += i;
+                count++;
+            }
+        }
+        return sum;
+    }
+
+    private bool[] Sieve(int limit)
+    {
+        bool[] isPrime = new bool[limit];
+        Array.Fill(isPrime, true);
+        isPrime[0] = isPrime[1] = false;
+        for (int p = 2; p * p < limit; p++)
+        {
+            if (isPrime[p])
+            {
+                for (int i = p * p; i < limit; i += p)
+                    isPrime[i] = false;
+            }
+        }
+        return isPrime;
+    }
+
+    private bool IsTruncatable(int n, bool[] isPrime)
+    {
+        string s = n.ToString();
+        for (int i = 1; i < s.Length; i++)
+        {
+            if (!isPrime[int.Parse(s.Substring(i))]) return false;
+            if (!isPrime[int.Parse(s.Substring(0, s.Length - i))]) return false;
+        }
+        return true;
+    }
+}
+
+

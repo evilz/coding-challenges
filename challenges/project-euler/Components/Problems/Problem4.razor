@@ -1,0 +1,32 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Collections.Generic
+@using System
+@using Projecteuler
+@page "/problem/4"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 4;
+
+    protected override string ProblemTitle => "Largest Palindrome Product";
+
+    protected override string Description => "A palindromic number reads the same both ways. The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 x 99.\n\nFind the largest palindrome made from the product of two 3-digit numbers.";
+
+    protected override string Explanation => "We generate all products of two 3-digit numbers (100-999) and check if each product is a palindrome by comparing its string representation with its reverse. The maximum palindromic product is the answer.";
+
+    protected override long Resolve()
+    {
+        // not so smart :( , can be faster
+        return Enumerable.Range(100, 900)
+                .SelectMany((i,index) => Enumerable.Range(100, 900).Select(j => j * i))
+                .Where(i => i.ToString() == string.Join(string.Empty, i.ToString().Reverse()))
+                .Max();
+    }
+}
+
+

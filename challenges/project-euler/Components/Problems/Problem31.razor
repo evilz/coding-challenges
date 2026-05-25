@@ -1,0 +1,36 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/31"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 31;
+
+    protected override string ProblemTitle => "Coin Sums";
+
+    protected override string Description => "<p>In the United Kingdom the currency is made up of pound (£) and pence (p). There are eight coins in general circulation:</p>\n<blockquote>1p, 2p, 5p, 10p, 20p, 50p, £1 (100p), and £2 (200p).</blockquote>\n<p>It is possible to make £2 in the following way:</p>\n<blockquote>1×£1 + 1×50p + 2×20p + 1×5p + 1×2p + 3×1p</blockquote>\n<p>How many different ways can £2 be made using any number of coins?</p>";
+
+    protected override string Explanation => "We can use dynamic programming to solve this. Let <code>ways[i]</code> be the number of ways to make <code>i</code> pence. For each coin value, we iterate through the <code>ways</code> array and update it: <code>ways[j] += ways[j - coin]</code>.";
+
+    protected override long Resolve()
+    {
+        int target = 200;
+        int[] coins = { 1, 2, 5, 10, 20, 50, 100, 200 };
+        long[] ways = new long[target + 1];
+        ways[0] = 1;
+
+        foreach (var coin in coins)
+        {
+            for (int i = coin; i <= target; i++)
+            {
+                ways[i] += ways[i - coin];
+            }
+        }
+        return ways[target];
+    }
+}
+
+

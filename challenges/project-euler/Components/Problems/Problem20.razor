@@ -1,0 +1,33 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Numerics
+@page "/problem/20"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 20;
+
+    protected override string ProblemTitle => "Factorial Digit Sum";
+
+    protected override string Description => "n! means n × (n − 1) × ... × 3 × 2 × 1.\n\nFor example, 10! = 10 × 9 × ... × 3 × 2 × 1 = 3628800, and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.\n\nFind the sum of the digits in the number 100!.";
+
+    protected override string Explanation => "We use BigInteger to calculate 100! (factorial), convert it to a string, and sum each digit. BigInteger handles the large number (100! has 158 digits) without overflow.";
+
+    protected override long Resolve()
+    {
+        BigInteger factorial = 1;
+        for (int i = 2; i <= 100; i++)
+        {
+            factorial *= i;
+        }
+
+        string factorialStr = factorial.ToString();
+        return factorialStr.Select(c => c - '0').Sum();
+    }
+}
+
+

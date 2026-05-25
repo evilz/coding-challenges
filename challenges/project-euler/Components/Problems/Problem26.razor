@@ -1,0 +1,56 @@
+@namespace Projecteuler.Components.Problems
+@using System
+@using System.Collections.Generic
+@page "/problem/26"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 26;
+
+    protected override string ProblemTitle => "Reciprocal Cycles";
+
+    protected override string Description => "<p>A unit fraction contains $1$ in the numerator. The decimal representation of the unit fractions with denominators $2$ to $10$ are given:</p>\n$$\\\\begin{align}\n1/2 &amp;= 0.5\\\n1/3 &amp;=0.(3)\\\n1/4 &amp;=0.25\\\n1/5 &amp;= 0.2\\\n1/6 &amp;= 0.1(6)\\\n1/7 &amp;= 0.(142857)\\\n1/8 &amp;= 0.125\\\n1/9 &amp;= 0.(1)\\\n1/10 &amp;= 0.1\n\\\\end{align}$$\n<p>Where $0.1(6)$ means $0.166666\\\\cdots$, and has a $1$-digit recurring cycle. It can be seen that $1/7$ has a $6$-digit recurring cycle.</p>\n<p>Find the value of $d \\\\lt 1000$ for which $1/d$ contains the longest recurring cycle in its decimal fraction part.</p>";
+
+    protected override string Explanation => "For each denominator $d$, we simulate long division of $1/d$ and track the first position where each remainder appears. When a remainder repeats, the cycle length is the distance between positions. The $d<1000$ with the longest cycle is returned.";
+
+    protected override long Resolve()
+    {
+        int bestD = 0;
+        int bestLen = 0;
+
+        for (int d = 2; d < 1000; d++)
+        {
+            int length = RecurringCycleLength(d);
+            if (length > bestLen)
+            {
+                bestLen = length;
+                bestD = d;
+            }
+        }
+
+        return bestD;
+    }
+
+    private static int RecurringCycleLength(int d)
+    {
+        Dictionary<int, int> seen = new();
+        int remainder = 1 % d;
+        int pos = 0;
+
+        while (remainder != 0 && !seen.ContainsKey(remainder))
+        {
+            seen[remainder] = pos;
+            remainder = (remainder * 10) % d;
+            pos++;
+        }
+
+        if (remainder == 0) return 0;
+        return pos - seen[remainder];
+    }
+}
+
+

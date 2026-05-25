@@ -1,0 +1,65 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@page "/problem/19"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 19;
+
+    protected override string ProblemTitle => "Counting Sundays";
+
+    protected override string Description => "You are given the following information, but you may prefer to do some research for yourself.\n\n• 1 Jan 1900 was a Monday.\n• Thirty days has September, April, June and November. All the rest have thirty-one, Saving February alone, Which has twenty-eight, rain or shine. And on leap years, twenty-nine.\n• A leap year occurs on any year evenly divisible by 4, but not on a century unless it is divisible by 400.\n\nHow many Sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?";
+
+    protected override string Explanation => "We iterate through each month from January 1901 to December 2000, tracking the day of the week. Starting from 1 Jan 1900 (Monday), we count forward through the days, checking if the 1st of each month falls on a Sunday (day 0 in our 0-6 system where Monday=1).";
+
+    protected override long Resolve()
+    {
+        int sundayCount = 0;
+        
+        // 1 Jan 1900 was a Monday, so we start counting from there
+        // Days of week: 0=Sunday, 1=Monday, ..., 6=Saturday
+        int dayOfWeek = 1; // Monday
+
+        // Days in each month (non-leap year)
+        int[] daysInMonth = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+        // First, skip through 1900 to get to 1 Jan 1901
+        for (int month = 0; month < 12; month++)
+        {
+            int days = daysInMonth[month];
+            if (month == 1 && IsLeapYear(1900))
+                days = 29;
+            dayOfWeek = (dayOfWeek + days) % 7;
+        }
+
+        // Now count Sundays from 1 Jan 1901 to 31 Dec 2000
+        for (int year = 1901; year <= 2000; year++)
+        {
+            for (int month = 0; month < 12; month++)
+            {
+                // Check if the 1st of this month is a Sunday
+                if (dayOfWeek == 0)
+                    sundayCount++;
+
+                // Move to the 1st of next month
+                int days = daysInMonth[month];
+                if (month == 1 && IsLeapYear(year))
+                    days = 29;
+                dayOfWeek = (dayOfWeek + days) % 7;
+            }
+        }
+
+        return sundayCount;
+    }
+
+    private bool IsLeapYear(int year)
+    {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+}
+
+

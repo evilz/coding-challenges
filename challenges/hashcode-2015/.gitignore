@@ -1,0 +1,14 @@
+*.exe
+**/Debug/*
+**/Release/*
+**/Packages/*
+
+# Visual Studio / MSBuild artifacts
+**/bin/*
+**/obj/*
+**/.vs/*
+**/*.user
+**/*.suo
+**/*.cache
+**/*.tmp
+**/TestResults/*

@@ -1,0 +1,62 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/35"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 35;
+
+    protected override string ProblemTitle => "Circular Primes";
+
+    protected override string Description => "<p>The number, $197$, is called a circular prime because all rotations of the digits: $197$, $971$, and $719$, are themselves prime.</p>\n<p>There are thirteen such primes below $100$: $2, 3, 5, 7, 11, 13, 17, 31, 37, 71, 73, 79$, and $97$.</p>\n<p>How many circular primes are there below one million?</p>";
+
+    protected override string Explanation => "We use a sieve to find all primes below 1,000,000. Then, for each prime, we generate all its rotations and check if each rotation is also prime.";
+
+    protected override long Resolve()
+    {
+        int limit = 1000000;
+        bool[] isPrime = Sieve(limit);
+        int count = 0;
+
+        for (int i = 2; i < limit; i++)
+        {
+            if (isPrime[i] && IsCircularPrime(i, isPrime))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private bool[] Sieve(int limit)
+    {
+        bool[] isPrime = new bool[limit];
+        Array.Fill(isPrime, true);
+        isPrime[0] = isPrime[1] = false;
+        for (int p = 2; p * p < limit; p++)
+        {
+            if (isPrime[p])
+            {
+                for (int i = p * p; i < limit; i += p)
+                    isPrime[i] = false;
+            }
+        }
+        return isPrime;
+    }
+
+    private bool IsCircularPrime(int n, bool[] isPrime)
+    {
+        string s = n.ToString();
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (!isPrime[int.Parse(s)]) return false;
+            s = s.Substring(1) + s[0];
+        }
+        return true;
+    }
+}
+
+

@@ -1,0 +1,30 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using Projecteuler
+@page "/problem/6"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 6;
+
+    protected override string ProblemTitle => "Sum Square Difference";
+
+    protected override string Description => "The sum of the squares of the first ten natural numbers is,\n1² + 2² + ... + 10² = 385.\nThe square of the sum of the first ten natural numbers is,\n(1 + 2 + ... + 10)² = 55² = 3025.\nHence the difference between the sum of the squares of the first ten natural numbers and the square of the sum is 3025 - 385 = 2640.\n\nFind the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.";
+
+    protected override string Explanation => "We calculate the sum of squares (1² + 2² + ... + 100²) and the square of the sum ((1 + 2 + ... + 100)²), then find their difference. The square of the sum minus the sum of squares gives us the answer.";
+
+    protected override long Resolve()
+    {
+        var numbers = Enumerable.Range(1, 100);
+        var sumOfSquares = numbers.Sum(n => (long)n * n);
+        var sum = numbers.Sum();
+        var squareOfSum = (long)sum * sum;
+        return squareOfSum - sumOfSquares;
+    }
+}
+
+

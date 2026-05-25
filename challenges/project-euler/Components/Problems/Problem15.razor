@@ -1,0 +1,42 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@page "/problem/15"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 15;
+
+    protected override string ProblemTitle => "Lattice Paths";
+
+    protected override string Description => "Starting in the top left corner of a 2×2 grid, and only being able to move to the right and down, there are exactly 6 routes to the bottom right corner.\n\nHow many such routes are there through a 20×20 grid?";
+
+    protected override string Explanation => "This is a combinatorial problem. To reach the bottom-right corner of an n×n grid, we need to make exactly n moves right and n moves down, totaling 2n moves. The number of unique paths is the number of ways to choose n positions out of 2n for the 'right' moves, which is C(2n, n) = (2n)! / (n! * n!). For a 20×20 grid, this is C(40, 20).";
+
+    protected override long Resolve()
+    {
+        int gridSize = 20;
+        return CalculateCombination(2 * gridSize, gridSize);
+    }
+
+    private long CalculateCombination(int n, int k)
+    {
+        // C(n, k) = n! / (k! * (n-k)!)
+        // Optimize by using C(n, k) = C(n, n-k) and choosing the smaller k
+        if (k > n - k)
+            k = n - k;
+
+        long result = 1;
+        for (int i = 0; i < k; i++)
+        {
+            result *= (n - i);
+            result /= (i + 1);
+        }
+        return result;
+    }
+}
+
+

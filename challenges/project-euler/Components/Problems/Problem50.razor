@@ -1,0 +1,64 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/50"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 50;
+
+    protected override string ProblemTitle => "Consecutive Prime Sum";
+
+    protected override string Description => "<p>The prime $41$, can be written as the sum of six consecutive primes:</p>\n$$41 = 2 + 3 + 5 + 7 + 11 + 13.$$\n<p>This is the longest sum of consecutive primes that adds to a prime below one-hundred.</p>\n<p>The longest sum of consecutive primes below one-thousand that adds to a prime, contains $21$ terms, and is equal to $953$.</p>\n<p>Which prime, below one-million, can be written as the sum of the most consecutive primes?</p>";
+
+    protected override string Explanation => "We use a sieve to find all primes below 1,000,000. Then we use prefix sums of these primes to efficiently calculate the sum of any range of consecutive primes. We iterate through all possible range lengths (starting from the maximum possible) and starting positions to find the longest sum that results in a prime below 1,000,000.";
+
+    protected override long Resolve()
+    {
+        int limit = 1000000;
+        bool[] isPrime = Sieve(limit);
+        List<int> primes = new List<int>();
+        for (int i = 2; i < limit; i++) if (isPrime[i]) primes.Add(i);
+
+        long[] primeSum = new long[primes.Count + 1];
+        for (int i = 0; i < primes.Count; i++) primeSum[i + 1] = primeSum[i] + primes[i];
+
+        int maxLen = 0;
+        long result = 0;
+
+        for (int i = 0; i < primeSum.Length; i++)
+        {
+            for (int j = i + maxLen + 1; j < primeSum.Length; j++)
+            {
+                long sum = primeSum[j] - primeSum[i];
+                if (sum >= limit) break;
+                if (isPrime[(int)sum])
+                {
+                    maxLen = j - i;
+                    result = sum;
+                }
+            }
+        }
+        return result;
+    }
+
+    private bool[] Sieve(int limit)
+    {
+        bool[] isPrime = new bool[limit];
+        Array.Fill(isPrime, true);
+        isPrime[0] = isPrime[1] = false;
+        for (int p = 2; p * p < limit; p++)
+        {
+            if (isPrime[p])
+            {
+                for (int i = p * p; i < limit; i += p)
+                    isPrime[i] = false;
+            }
+        }
+        return isPrime;
+    }
+}
+
+

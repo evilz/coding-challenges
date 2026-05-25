@@ -1,0 +1,49 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@using System.Collections.Generic
+@using Projecteuler
+@page "/problem/3"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 3;
+
+    protected override string ProblemTitle => "Largest Prime Factor";
+
+    protected override string Description => "The prime factors of 13195 are 5, 7, 13 and 29.\nWhat is the largest prime factor of the number 600851475143 ?";
+
+    protected override string Explanation => "We factorize 600851475143 by repeatedly dividing by the smallest divisor until we reach 1. The largest prime factor found in this process is the answer.";
+
+    protected override long Resolve()
+    {
+        long max = 600851475143;
+        return PrimeNumbers(max).Max();
+    }
+
+    public static IEnumerable<long> PrimeNumbers(long source)
+    {
+        while (source > 1)
+        {
+            var divider = (
+                from i in LongRange(2, source)
+                where (source % i == 0) || (source == i)
+                select i).First();
+            yield return divider;
+            source = source / divider;
+        }
+    }
+
+    public static IEnumerable<long> LongRange(long start, long end)
+    {
+        for (long l = start; l <= end; l++)
+        {
+            yield return l;
+        }
+    }
+}
+
+

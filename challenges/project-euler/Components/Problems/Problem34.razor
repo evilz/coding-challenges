@@ -1,0 +1,48 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/34"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 34;
+
+    protected override string ProblemTitle => "Digit Factorials";
+
+    protected override string Description => "<p>$145$ is a curious number, as $1! + 4! + 5! = 1 + 24 + 120 = 145$.</p>\n<p>Find the sum of all numbers which are equal to the sum of the factorial of their digits.</p>\n<p class=\"smaller\">Note: As $1! = 1$ and $2! = 2$ are not sums they are not included.</p>";
+
+    protected override string Explanation => "The maximum possible sum for a 7-digit number is $9! \\\\times 7 = 2,540,160$, so we only need to check numbers up to that limit. We precompute factorials of digits 0-9 for efficiency.";
+
+    protected override long Resolve()
+    {
+        int[] fact = new int[10];
+        fact[0] = 1;
+        for (int i = 1; i < 10; i++) fact[i] = fact[i - 1] * i;
+
+        long totalSum = 0;
+        for (int i = 10; i < 2540161; i++)
+        {
+            if (i == DigitFactorialSum(i, fact))
+            {
+                totalSum += i;
+            }
+        }
+        return totalSum;
+    }
+
+    private int DigitFactorialSum(int n, int[] fact)
+    {
+        int sum = 0;
+        int temp = n;
+        while (temp > 0)
+        {
+            sum += fact[temp % 10];
+            temp /= 10;
+        }
+        return sum;
+    }
+}
+
+

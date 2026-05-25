@@ -1,0 +1,50 @@
+@namespace Projecteuler.Components.Problems
+@using System
+@page "/problem/30"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 30;
+
+    protected override string ProblemTitle => "Digit Fifth Powers";
+
+    protected override string Description => "<p>Surprisingly there are only three numbers that can be written as the sum of fourth powers of their digits:\n$$\\\\begin{align}\n1634 &amp;= 1^4 + 6^4 + 3^4 + 4^4\\\n8208 &amp;= 8^4 + 2^4 + 0^4 + 8^4\\\n9474 &amp;= 9^4 + 4^4 + 7^4 + 4^4\n\\\\end{align}$$\n</p><p class=\"smaller\">As $1 = 1^4$ is not a sum it is not included.</p>\n<p>The sum of these numbers is $1634 + 8208 + 9474 = 19316$.</p>\n<p>Find the sum of all the numbers that can be written as the sum of fifth powers of their digits.</p>";
+
+    protected override string Explanation => "We precompute $d^5$ for digits 0–9 and test all numbers up to $6\\\\times 9^5$ (the maximum possible sum for 6 digits). A number equals the sum of fifth powers of its digits if it matches the precomputed digit sum; we sum all such numbers.";
+
+    protected override long Resolve()
+    {
+        int[] pow5 = new int[10];
+        for (int d = 0; d <= 9; d++)
+        {
+            pow5[d] = d * d * d * d * d;
+        }
+
+        int limit = 6 * pow5[9];
+        long total = 0;
+
+        for (int n = 2; n <= limit; n++)
+        {
+            int sum = 0;
+            int temp = n;
+            while (temp > 0)
+            {
+                sum += pow5[temp % 10];
+                temp /= 10;
+            }
+
+            if (sum == n)
+            {
+                total += n;
+            }
+        }
+
+        return total;
+    }
+}
+
+

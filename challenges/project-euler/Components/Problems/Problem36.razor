@@ -1,0 +1,42 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/36"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 36;
+
+    protected override string ProblemTitle => "Double-base Palindromes";
+
+    protected override string Description => "<p>The decimal number, $585 = 1001001001_2$ (binary), is palindromic in both bases.</p>\n<p>Find the sum of all numbers, less than one million, which are palindromic in base $10$ and base $2$.</p>\n<p class=\"smaller\">(Please note that the palindromic number, in either base, may not include leading zeros.)</p>";
+
+    protected override string Explanation => "We iterate from 1 to 1,000,000. For each number, we check if its base-10 and base-2 representations are palindromes. We sum the numbers that satisfy both conditions.";
+
+    protected override long Resolve()
+    {
+        long sum = 0;
+        for (int i = 1; i < 1000000; i++)
+        {
+            if (IsPalindrome(i.ToString()) && IsPalindrome(Convert.ToString(i, 2)))
+            {
+                sum += i;
+            }
+        }
+        return sum;
+    }
+
+    private bool IsPalindrome(string s)
+    {
+        int i = 0, j = s.Length - 1;
+        while (i < j)
+        {
+            if (s[i++] != s[j--]) return false;
+        }
+        return true;
+    }
+}
+
+

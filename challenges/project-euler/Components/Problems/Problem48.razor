@@ -1,0 +1,56 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/48"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 48;
+
+    protected override string ProblemTitle => "Self Powers";
+
+    protected override string Description => "<p>The series, $1^1 + 2^2 + 3^3 + \\\\cdots + 10^{10} = 10405071317$.</p>\n<p>Find the last ten digits of the series, $1^1 + 2^2 + 3^3 + \\\\cdots + 1000^{1000}$.</p>";
+
+    protected override string Explanation => "We use modular arithmetic to find the last 10 digits of the sum. For each term $i^i$, we calculate $i^i \\\\pmod{10^{10}}$ and add it to the total sum, taking the modulo at each step.";
+
+    protected override long Resolve()
+    {
+        long modulo = 10000000000L;
+        long sum = 0;
+        for (int i = 1; i <= 1000; i++)
+        {
+            sum = (sum + Power(i, i, modulo)) % modulo;
+        }
+        return sum;
+    }
+
+    private long Power(long b, long e, long m)
+    {
+        long res = 1;
+        b %= m;
+        while (e > 0)
+        {
+            if (e % 2 == 1) res = Multiply(res, b, m);
+            b = Multiply(b, b, m);
+            e /= 2;
+        }
+        return res;
+    }
+
+    private long Multiply(long a, long b, long m)
+    {
+        long res = 0;
+        a %= m;
+        while (b > 0)
+        {
+            if (b % 2 == 1) res = (res + a) % m;
+            a = (a * 2) % m;
+            b /= 2;
+        }
+        return res;
+    }
+}
+
+

@@ -1,0 +1,44 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/33"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 33;
+
+    protected override string ProblemTitle => "Digit Cancelling Fractions";
+
+    protected override string Description => "<p>The fraction $49/98$ is a curious fraction, as an inexperienced mathematician in attempting to simplify it may incorrectly believe that $49/98 = 4/8$, which is correct, is obtained by cancelling the $9$s.</p>\n<p>We shall consider fractions like, $30/50 = 3/5$, to be trivial examples.</p>\n<p>There are exactly four non-trivial examples of this type of fraction, less than one in value, and containing two digits in the numerator and denominator.</p>\n<p>If the product of these four fractions is given in its lowest common terms, find the value of the denominator.</p>";
+
+    protected override string Explanation => "We brute force all fractions $n/d$ where $10 \\\\le n < d < 100$. For each fraction, we check if they share a common digit (excluding 0). If they do, we check if 'cancelling' that digit results in a fraction with the same value. The four resulting fractions are multiplied, and we find the denominator of the product in its simplest form.";
+
+    protected override long Resolve()
+    {
+        int finalNum = 1;
+        int finalDen = 1;
+
+        for (int d = 10; d < 100; d++)
+        {
+            for (int n = 10; n < d; n++)
+            {
+                int n1 = n / 10, n2 = n % 10;
+                int d1 = d / 10, d2 = d % 10;
+
+                if (n2 == d1 && n1 * d == n * d2 && n2 != 0)
+                {
+                    finalNum *= n;
+                    finalDen *= d;
+                }
+            }
+        }
+
+        return finalDen / GCD(finalNum, finalDen);
+    }
+
+    private int GCD(int a, int b) => b == 0 ? a : GCD(b, a % b);
+}
+
+

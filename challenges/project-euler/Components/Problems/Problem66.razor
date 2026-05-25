@@ -1,0 +1,26 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/66"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 66;
+
+    protected override string ProblemTitle => "Diophantine Equation";
+
+    protected override string Description => "<p>Consider quadratic Diophantine equations of the form:\n$$x^2 - Dy^2 = 1$$</p>\n<p>For example, when $D=13$, the minimal solution in $x$ is $649^2 - 13 \\\\times 180^2 = 1$.</p>\n<p>It can be assumed that there are no solutions in positive integers when $D$ is square.</p>\n<p>By finding minimal solutions in $x$ for $D = \\\\{2, 3, 5, 6, 7\\\\}$, we obtain the following:</p>\n$$\\\\begin{align}\n3^2 - 2 \\\\times 2^2 &amp;= 1\\\n2^2 - 3 \\\\times 1^2 &amp;= 1\\\n{\\\\color{red}{\\\\mathbf 9}}^2 - 5 \\\\times 4^2 &amp;= 1\\\n5^2 - 6 \\\\times 2^2 &amp;= 1\\\n8^2 - 7 \\\\times 3^2 &amp;= 1\n\\\\end{align}$$\n<p>Hence, by considering minimal solutions in $x$ for $D \\\\le 7$, the largest $x$ is obtained when $D=5$.</p>\n<p>Find the value of $D \\\\le 1000$ in minimal solutions of $x$ for which the largest value of $x$ is obtained.</p>";
+
+    protected override string Explanation => "Not implemented yet.";
+
+    protected override long Resolve()
+    {
+        // TODO: Implement problem 66
+        // Diophantine Equation
+        return 0;
+    }
+}
+
+

@@ -1,0 +1,36 @@
+deployment:
+  image: foundation-platform-docker.registry.vptech.eu/vpcomposer:latest
+  stage: deploy
+  environment:
+    name: staging
+  services:
+    - name: docker.registry.vptech.eu/docker:19.03.12-dind
+      alias: docker
+  image: docker.registry.vptech.eu/docker:19.03.12
+
+  tags:
+    - foundation-platform
+  script:
+    - |
+      vpcomposer deploy \
+      --stackname=${CI_PROJECT_NAME} \
+      --stage=${CI_ENVIRONMENT_SLUG}
+
+delete:
+  image: foundation-platform-docker.registry.vptech.eu/vpcomposer:latest
+  stage: deploy
+  environment:
+    name: staging
+  services:
+    - name: docker.registry.vptech.eu/docker:19.03.12-dind
+      alias: docker
+  image: docker.registry.vptech.eu/docker:19.03.12
+
+  tags:
+    - foundation-platform
+  script:
+    - |
+      vpcomposer delete \
+      --stackname=${CI_PROJECT_NAME} \
+      --stage=${CI_ENVIRONMENT_SLUG}
+  when: manual

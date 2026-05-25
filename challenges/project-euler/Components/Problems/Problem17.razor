@@ -1,0 +1,72 @@
+@namespace Projecteuler.Components.Problems
+@using System.Linq
+@page "/problem/17"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 17;
+
+    protected override string ProblemTitle => "Number Letter Counts";
+
+    protected override string Description => "If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total.\n\nIf all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?\n\nNOTE: Do not count spaces or hyphens. For example, 342 (three hundred and forty-two) contains 23 letters and 115 (one hundred and fifteen) contains 20 letters. The use of \"and\" when writing out numbers is in compliance with British usage.";
+
+    protected override string Explanation => "We convert each number from 1 to 1000 to its English word representation following British conventions (using 'and'), remove spaces and hyphens, and count the total letters.";
+
+    protected override long Resolve()
+    {
+        int totalLetters = 0;
+        for (int i = 1; i <= 1000; i++)
+        {
+            totalLetters += NumberToWords(i).Replace(" ", "").Replace("-", "").Length;
+        }
+        return totalLetters;
+    }
+
+    private string NumberToWords(int number)
+    {
+        if (number == 1000) return "one thousand";
+        
+        string[] ones = { "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+        string[] teens = { "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
+        string[] tens = { "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+
+        string result = "";
+
+        // Hundreds place
+        if (number >= 100)
+        {
+            result += ones[number / 100] + " hundred";
+            if (number % 100 != 0)
+            {
+                result += " and ";
+            }
+            number %= 100;
+        }
+
+        // Tens and ones place
+        if (number >= 20)
+        {
+            result += tens[number / 10];
+            if (number % 10 != 0)
+            {
+                result += "-" + ones[number % 10];
+            }
+        }
+        else if (number >= 10)
+        {
+            result += teens[number - 10];
+        }
+        else if (number > 0)
+        {
+            result += ones[number];
+        }
+
+        return result;
+    }
+}
+
+

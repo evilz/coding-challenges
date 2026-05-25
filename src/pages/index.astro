@@ -1,0 +1,143 @@
+---
+import { Icon } from 'astro-icon/components';
+
+import Layout from '~/layouts/PageLayout.astro';
+import Button from '~/components/ui/Button.astro';
+import CatalogCard from '~/components/catalog/CatalogCard.astro';
+import { fetchCatalogItems } from '~/utils/catalog';
+import { getPermalink } from '~/utils/permalinks';
+
+const items = await fetchCatalogItems();
+const visibleItems = items.slice(0, 6);
+const languages = Array.from(new Set(items.flatMap((item) => item.languages))).sort();
+const topics = Array.from(new Set(items.flatMap((item) => item.topics))).sort();
+
+const metadata = {
+  title: 'Coding Challenges',
+  ignoreTitleTemplate: true,
+  description: 'A consolidated catalog of coding challenges, technical tests, and programming contests.',
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <div class="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:px-8 lg:py-24">
+      <div class="max-w-3xl">
+        <p
+          class="mb-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
+        >
+          <Icon name="tabler:folder-code" class="h-4 w-4" />
+          Folder-backed challenge catalog
+        </p>
+        <h1 class="text-5xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-6xl">Coding Challenges</h1>
+        <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+          One catalog for competitive programming, technical tests, Google Code Jam and Hash Code entries, Project
+          Euler, Codingame, and other challenge repositories. Every entry is generated from a folder under `challenges/`
+          with its own README.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button
+            variant="primary"
+            href={getPermalink('/challenges')}
+            text="Browse catalog"
+            icon="tabler:layout-grid"
+          />
+          <Button
+            href="https://github.com/evilz/coding-challenges"
+            target="_blank"
+            text="View repository"
+            icon="tabler:brand-github"
+          />
+        </div>
+      </div>
+
+      <aside
+        class="grid content-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900"
+      >
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-800">
+          <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Catalog status</span>
+          <span class="text-sm font-semibold text-slate-900 dark:text-white">{items.length} entries</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="rounded-md bg-white p-4 shadow-sm dark:bg-slate-950">
+            <p class="text-3xl font-bold text-slate-950 dark:text-white">{items.length}</p>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Folders</p>
+          </div>
+          <div class="rounded-md bg-white p-4 shadow-sm dark:bg-slate-950">
+            <p class="text-3xl font-bold text-slate-950 dark:text-white">{languages.length}</p>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Languages</p>
+          </div>
+          <div class="rounded-md bg-white p-4 shadow-sm dark:bg-slate-950">
+            <p class="text-3xl font-bold text-slate-950 dark:text-white">{topics.length}</p>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Topics</p>
+          </div>
+        </div>
+        <dl class="grid gap-3 text-sm text-slate-600 dark:text-slate-300">
+          <div class="flex items-center justify-between">
+            <dt>Languages</dt>
+            <dd class="font-medium text-slate-950 dark:text-white">{languages.length}</dd>
+          </div>
+          <div class="flex items-center justify-between">
+            <dt>Topics</dt>
+            <dd class="font-medium text-slate-950 dark:text-white">{topics.length}</dd>
+          </div>
+          <div class="flex items-center justify-between">
+            <dt>Source folder</dt>
+            <dd>
+              <a
+                class="font-medium text-blue-700 hover:underline dark:text-blue-300"
+                href="https://github.com/evilz/coding-challenges/tree/main/challenges">challenges/</a
+              >
+            </dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="bg-slate-50 py-14 dark:bg-slate-900/60">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-normal text-emerald-700 dark:text-emerald-300">Catalog</p>
+          <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">Challenges folders</h2>
+        </div>
+        <a
+          class="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:underline dark:text-blue-300"
+          href={getPermalink('/challenges')}
+        >
+          View all
+          <Icon name="tabler:arrow-right" class="h-4 w-4" />
+        </a>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {visibleItems.map((item) => <CatalogCard item={item} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white py-14 dark:bg-slate-950">
+    <div class="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-normal text-emerald-700 dark:text-emerald-300">Workflow</p>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+          How new challenges land here
+        </h2>
+      </div>
+      <div class="grid gap-4 lg:col-span-2 md:grid-cols-3">
+        {
+          [
+            ['Create a folder', 'Each entry lives directly under challenges/<slug>.'],
+            ['Write the README', 'The catalog entry and detail page are generated from challenges/<slug>/README.md.'],
+            ['Publish Pages', 'Astro builds the static site and GitHub Actions deploys it.'],
+          ].map(([title, body]) => (
+            <div class="rounded-lg border border-slate-200 p-5 dark:border-slate-800">
+              <h3 class="font-semibold text-slate-950 dark:text-white">{title}</h3>
+              <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

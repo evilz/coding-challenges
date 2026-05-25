@@ -1,0 +1,26 @@
+@namespace Projecteuler.Components.Problems
+@page "/problem/75"
+@inherits ProblemBase
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override int Ref => 75;
+
+    protected override string ProblemTitle => "Singular Integer Right Triangles";
+
+    protected override string Description => "<p>It turns out that $\\\\pu{12 cm}$ is the smallest length of wire that can be bent to form an integer sided right angle triangle in exactly one way, but there are many more examples.</p>\n<ul style=\"list-style-type:none;\">\n<li>$\\\\pu{\\\\mathbf{12} \\\\mathbf{cm}}$: $(3,4,5)$</li>\n<li>$\\\\pu{\\\\mathbf{24} \\\\mathbf{cm}}$: $(6,8,10)$</li>\n<li>$\\\\pu{\\\\mathbf{30} \\\\mathbf{cm}}$: $(5,12,13)$</li>\n<li>$\\\\pu{\\\\mathbf{36} \\\\mathbf{cm}}$: $(9,12,15)$</li>\n<li>$\\\\pu{\\\\mathbf{40} \\\\mathbf{cm}}$: $(8,15,17)$</li>\n<li>$\\\\pu{\\\\mathbf{48} \\\\mathbf{cm}}$: $(12,16,20)$</li></ul>\n<p>In contrast, some lengths of wire, like $\\\\pu{20 cm}$, cannot be bent to form an integer sided right angle triangle, and other lengths allow more than one solution to be found; for example, using $\\\\pu{120 cm}$ it is possible to form exactly three different integer sided right angle triangles.</p>\n<ul style=\"list-style-type:none;\">\n<li>$\\\\pu{\\\\mathbf{120} \\\\mathbf{cm}}$: $(30,40,50)$, $(20,48,52)$, $(24,45,51)$</li></ul>\n\n<p>Given that $L$ is the length of the wire, for how many values of $L \\\\le 1\\\\,500\\\\,000$ can exactly one integer sided right angle triangle be formed?</p>";
+
+    protected override string Explanation => "Not implemented yet.";
+
+    protected override long Resolve()
+    {
+        // TODO: Implement problem 75
+        // Singular Integer Right Triangles
+        return 0;
+    }
+}
+
+
