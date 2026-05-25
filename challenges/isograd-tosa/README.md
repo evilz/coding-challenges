@@ -1,14 +1,4 @@
----
-title: "TOSA / Isograd Contest"
-summary: "Isograd and TOSA contest exercises."
-sourceUrl: https://github.com/evilz/isograd-tosa
-topics:
-  - challenge
-  - isograd
-  - csharp
----
-
-# TOSA / Isograd contest
+﻿# TOSA / Isograd contest
 
 1. BATTLE ISOGRAD TEST
 2. BATTLE DEV ESILV
@@ -18,5 +8,3 @@ topics:
 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/tjkxt6620ppvc6w6?svg=true)](https://ci.appveyor.com/project/evilz/isograd-tosa)
-
-

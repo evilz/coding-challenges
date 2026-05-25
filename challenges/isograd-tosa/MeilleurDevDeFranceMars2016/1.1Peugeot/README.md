@@ -2,19 +2,19 @@
 
 ![](CTSTFR0055.jpg)
 
-## Enoncé
+## EnoncÃ©
 
-Dans ce challenge, l'objectif est de déterminer la production d'une usine Peugeot sur un mois. 
+Dans ce challenge, l'objectif est de dÃ©terminer la production d'une usine Peugeot sur un mois.
 
-Chaque jour, l'usine produit un nombre de voitures X. 
+Chaque jour, l'usine produit un nombre de voitures X.
 
 Votre code doit renvoyer le nombre de voitures produites durant un mois.
 
-### Format des données
+### Format des donnÃ©es
 
-__Entrée__
-Ligne 1 : un entier N entre 28 et 31 représentant le nombre de jours dans le mois.
-Ligne 2 à N+1 : un entier X entre 10 et 100 représentant le nombre de voitures produites un jour du mois. Il y a une ligne pour chaque jour.
+__EntrÃ©e__
+Ligne 1 : un entier N entre 28 et 31 reprÃ©sentant le nombre de jours dans le mois.
+Ligne 2 Ã  N+1 : un entier X entre 10 et 100 reprÃ©sentant le nombre de voitures produites un jour du mois. Il y a une ligne pour chaque jour.
 
 __Sortie__
 Un entier indiquant le nombre de voitures produites durant le mois.

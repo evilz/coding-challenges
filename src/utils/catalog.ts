@@ -34,6 +34,24 @@ const GITHUB_REPOSITORY_URL = `https://github.com/evilz/${REPOSITORY_NAME}`;
 
 const TITLE_OVERRIDES: Record<string, string> = {};
 
+const EXCLUDED_CATALOG_DOCUMENTS = new Set([
+  'challenges/isograd-tosa/README.md',
+  'challenges/isograd-tosa/BATTLE-DEV-ESILV/README.md',
+  'challenges/isograd-tosa/BattleDevRegionsJobMars2016/1.first/README.md',
+  'challenges/isograd-tosa/BattleDevRegionsJobMars2016/2.second/README.md',
+  'challenges/isograd-tosa/BattleDevRegionsJobMars2016/3.three/README.md',
+  'challenges/isograd-tosa/BattleDevRegionsJobMars2016/4.four/README.md',
+  'challenges/isograd-tosa/BattleDevRegionsJobNovembre2015/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2015/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2016/0.Template/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2016/1bis.pub/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2016/2bis/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2016/3.dico/README.md',
+  'challenges/isograd-tosa/MeilleurDevDeFranceMars2016/README.md',
+  'challenges/isograd-tosa/SocieteGeneralOctober2015/README.md',
+  'challenges/isograd-tosa/SocieteGeneralOctober2016/README.md',
+]);
+
 const IGNORED_DIRECTORIES = new Set([
   '.git',
   '.idea',
@@ -98,6 +116,8 @@ const getContentRelativePath = (entry: CatalogEntry) => {
 
   return contentPathIndex >= 0 ? normalizedPath.slice(contentPathIndex) : normalizedPath;
 };
+
+const isCatalogDocument = (entry: CatalogEntry) => !EXCLUDED_CATALOG_DOCUMENTS.has(getContentRelativePath(entry));
 
 const getCatalogFolderFromPath = (entryPath: string) => {
   const normalizedPath = normalizeEntryId(entryPath);
@@ -255,8 +275,14 @@ export const getCatalogItemFromEntry = async (entry: CatalogEntry): Promise<Cata
 };
 
 export const fetchCatalogItems = async (): Promise<CatalogItem[]> => {
-  const entries = await getCollection('challenge');
+  const entries = await getCatalogEntries();
   const items = await Promise.all(entries.map((entry) => getCatalogItemFromEntry(entry)));
 
   return items.sort((a, b) => a.title.localeCompare(b.title));
+};
+
+export const getCatalogEntries = async (): Promise<CatalogEntry[]> => {
+  const entries = await getCollection('challenge');
+
+  return entries.filter(isCatalogDocument);
 };

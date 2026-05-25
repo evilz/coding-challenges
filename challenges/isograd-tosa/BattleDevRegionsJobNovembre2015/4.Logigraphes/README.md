@@ -1,28 +1,28 @@
-# 3.Scrabble
+# 4.Logigraphes
 
-## Enoncé
+## EnoncÃ©
 
-Après avoir intégré votre algorithme précédent dans une application installée dans l'iPhone de votre grand-mère, vous perdez un peu d'intérêt pour ce jeu. En feuilletant un magazine, vous tombez sur un logigraphe.
+AprÃ¨s avoir intÃ©grÃ© votre algorithme prÃ©cÃ©dent dans une application installÃ©e dans l'iPhone de votre grand-mÃ¨re, vous perdez un peu d'intÃ©rÃªt pour ce jeu. En feuilletant un magazine, vous tombez sur un logigraphe.
 
 ![](CTSTFR0051-1.jpg)
 
-Il s'agit d'une grille logique où en lignes et en colonnes, on dispose du nombre de cases à noircir consécutivement. Par exemple, 4-2 signifie qu'il y a un bloc de 4 cases puis un bloc de 2 cases à noircir sur cette ligne. Idem en colonnes. Dans ce problème, il ne s'agit pas de résoudre un logigraphe, mais d'en construire une grille pour un dessin donné.
+Il s'agit d'une grille logique oÃ¹ en lignes et en colonnes, on dispose du nombre de cases Ã  noircir consÃ©cutivement. Par exemple, 4-2 signifie qu'il y a un bloc de 4 cases puis un bloc de 2 cases Ã  noircir sur cette ligne. Idem en colonnes. Dans ce problÃ¨me, il ne s'agit pas de rÃ©soudre un logigraphe, mais d'en construire une grille pour un dessin donnÃ©.
 
-### Format des données
+### Format des donnÃ©es
 
-__Entrée__
-Ligne 1 : deux entiers N et M séparés par des espaces, représentant la hauteur et la largeur du dessin.
+__EntrÃ©e__
+Ligne 1 : deux entiers N et M sÃ©parÃ©s par des espaces, reprÃ©sentant la hauteur et la largeur du dessin.
 
-Lignes 2 à N + 1 : une ligne composée de M caractères . (case blanche) et x (case noircie), représentant une ligne du dessin.
+Lignes 2 Ã  N + 1 : une ligne composÃ©e de M caractÃ¨res . (case blanche) et x (case noircie), reprÃ©sentant une ligne du dessin.
 
 
 
 __Sortie__
-Les N+M instructions du logigraphe séparées par des espaces.
+Les N+M instructions du logigraphe sÃ©parÃ©es par des espaces.
 
-Chaque instruction est de la forme b1-b2-…-bk où les bi sont des entiers représentant le nombre de cases à noircir (dans le bon ordre).
+Chaque instruction est de la forme b1-b2-â€¦-bk oÃ¹ les bi sont des entiers reprÃ©sentant le nombre de cases Ã  noircir (dans le bon ordre).
 
-L'ordre des instructions correspond aux N lignes puis aux M colonnes. Quand une instruction est vide utilisez la chaîne ".".
+L'ordre des instructions correspond aux N lignes puis aux M colonnes. Quand une instruction est vide utilisez la chaÃ®ne ".".
 
 Exemple : pour le logigraphe suivant,
 ![](CTSTFR0051.png)
