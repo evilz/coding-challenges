@@ -11,7 +11,7 @@ const topics = Array.from(new Set(items.flatMap((item) => item.topics))).sort();
 
 const metadata = {
   title: 'Challenges catalog',
-  description: 'All challenges discovered from challenges/*/README.md.',
+  description: 'All challenge subjects discovered from Markdown files under challenges/.',
 };
 ---
 
@@ -21,12 +21,12 @@ const metadata = {
       <div class="max-w-3xl">
         <p class="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
           <Icon name="tabler:list-details" class="h-4 w-4" />
-          Markdown-backed catalog
+          Subject-backed catalog
         </p>
         <h1 class="text-4xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-5xl">Challenges catalog</h1>
         <p class="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
-          Each entry is generated from a top-level folder in `challenges/`. The README in that folder is both the source
-          documentation and the rendered detail page.
+          Each entry is generated from a Markdown subject under `challenges/`. Source code stays next to the subject,
+          and extracted PDF subjects link back to the original PDF file.
         </p>
       </div>
     </div>

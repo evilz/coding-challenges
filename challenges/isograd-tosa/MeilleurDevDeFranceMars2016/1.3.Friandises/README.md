@@ -1,5 +1,5 @@
 # 3.Distributeur de friandises (Phase 1)
-![](CTSTFR0059.jpg)  
+_Original image `CTSTFR0059.jpg` was referenced by this subject but is not present in the archived sources._
 
 **Énoncé**  
 

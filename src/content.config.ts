@@ -67,11 +67,13 @@ const postCollection = defineCollection({
 });
 
 const catalogCollection = defineCollection({
-  loader: glob({ pattern: ['*/README.md'], base: 'challenges' }),
+  loader: glob({ pattern: ['**/*.md', '**/*.mdx'], base: 'challenges' }),
   schema: z.object({
     title: z.string().optional(),
     summary: z.string().optional(),
     sourceUrl: z.url().optional(),
+    pdfUrl: z.url().optional(),
+    documentType: z.enum(['readme', 'subject', 'pdf']).optional(),
     languages: z.array(z.string()).optional(),
     topics: z.array(z.string()).optional(),
     metadata: metadataDefinition(),

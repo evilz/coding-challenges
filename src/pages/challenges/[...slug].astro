@@ -42,7 +42,9 @@ const metadata = {
         <h1 class="mt-6 text-4xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-5xl">{item.title}</h1>
         <p class="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">{item.summary}</p>
         <div class="mt-8 flex flex-wrap gap-3">
-          <Button variant="primary" href={item.repositoryUrl} target="_blank" text="Open challenge folder" icon="tabler:folder-code" />
+          <Button variant="primary" href={item.repositoryUrl} target="_blank" text="Open code folder" icon="tabler:folder-code" />
+          <Button href={item.documentUrl} target="_blank" text="Source markdown" icon="tabler:file-text" />
+          {item.pdfUrl && <Button href={item.pdfUrl} target="_blank" text="Original PDF" icon="tabler:file-type-pdf" />}
           {
             item.sourceUrl && (
               <Button href={item.sourceUrl} target="_blank" text="Source repository" icon="tabler:brand-github" />
@@ -60,6 +62,14 @@ const metadata = {
       <aside class="h-fit rounded-lg border border-slate-200 p-5 dark:border-slate-800">
         <h2 class="text-sm font-semibold uppercase tracking-normal text-slate-500 dark:text-slate-400">Metadata</h2>
         <dl class="mt-5 grid gap-4 text-sm">
+          <div>
+            <dt class="text-slate-500 dark:text-slate-400">Type</dt>
+            <dd class="mt-1 font-medium capitalize text-slate-950 dark:text-white">{item.documentType}</dd>
+          </div>
+          <div>
+            <dt class="text-slate-500 dark:text-slate-400">Document</dt>
+            <dd class="mt-1 font-mono text-xs font-medium text-slate-950 dark:text-white">{item.documentPath}</dd>
+          </div>
           <div>
             <dt class="text-slate-500 dark:text-slate-400">Folder</dt>
             <dd class="mt-1 font-mono text-xs font-medium text-slate-950 dark:text-white">{item.repositoryPath}</dd>

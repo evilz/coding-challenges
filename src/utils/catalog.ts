@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { getPermalink } from '~/utils/permalinks';
+import { cleanSlug, getPermalink } from '~/utils/permalinks';
 
 export type CatalogEntry = CollectionEntry<'challenge'>;
 
@@ -16,16 +16,21 @@ export type CatalogItem = {
   summary: string;
   languages: string[];
   topics: string[];
+  documentType: 'readme' | 'subject' | 'pdf';
+  documentPath: string;
+  documentUrl: string;
   readmePath: string;
   repositoryPath: string;
   repositoryUrl: string;
   sourceUrl?: string;
+  pdfUrl?: string;
 };
 
 const CONTENT_DIR = 'challenges';
 const ROUTE_PATH = 'challenges';
 const REPOSITORY_NAME = 'coding-challenges';
 const DEFAULT_TOPIC = 'challenge';
+const GITHUB_REPOSITORY_URL = `https://github.com/evilz/${REPOSITORY_NAME}`;
 
 const TITLE_OVERRIDES: Record<string, string> = {};
 
@@ -73,17 +78,63 @@ const LANGUAGE_BY_EXTENSION = new Map([
 const readEntryBody = (entry: CatalogEntry): string =>
   'body' in entry && typeof entry.body === 'string' ? entry.body : '';
 
-export const getCatalogFolder = (id: string) => id.replaceAll('\\', '/').split('/')[0];
+const normalizeEntryId = (id: string) => id.replaceAll('\\', '/');
 
-export const getCatalogSlug = (id: string) => getCatalogFolder(id);
+const stripMarkdownExtension = (value: string) => value.replace(/\.(md|mdx)$/i, '');
+
+const pathDirectory = (value: string) => {
+  const directory = path.posix.dirname(value);
+  return directory === '.' ? '' : directory;
+};
+
+const getEntryPathWithoutExtension = (id: string) => stripMarkdownExtension(normalizeEntryId(id));
+
+const isReadmePath = (id: string) => path.posix.basename(getEntryPathWithoutExtension(id)).toLowerCase() === 'readme';
+
+const getContentRelativePath = (entry: CatalogEntry) => {
+  const fallbackPath = `${CONTENT_DIR}/${normalizeEntryId(entry.id)}.md`;
+  const normalizedPath = normalizeEntryId(entry.filePath ?? fallbackPath);
+  const contentPathIndex = normalizedPath.lastIndexOf(`${CONTENT_DIR}/`);
+
+  return contentPathIndex >= 0 ? normalizedPath.slice(contentPathIndex) : normalizedPath;
+};
+
+const getCatalogFolderFromPath = (entryPath: string) => {
+  const normalizedPath = normalizeEntryId(entryPath);
+  const contentRelativePath = normalizedPath.replace(new RegExp(`^${CONTENT_DIR}/`), '');
+  const withoutExtension = stripMarkdownExtension(contentRelativePath);
+
+  return pathDirectory(withoutExtension);
+};
+
+export const getCatalogFolder = (id: string) => pathDirectory(getEntryPathWithoutExtension(id));
+
+const getCatalogSlugSource = (id: string) => {
+  const withoutExtension = getEntryPathWithoutExtension(id);
+
+  return isReadmePath(id) ? pathDirectory(withoutExtension) : withoutExtension;
+};
+
+export const getCatalogSlug = (id: string) => cleanSlug(getCatalogSlugSource(id));
 
 const titleFromSlug = (slug: string) =>
   TITLE_OVERRIDES[slug] ??
   slug
-    .split('-')
+    .split('/')
+    .filter(Boolean)
+    .at(-1)
+    ?.split(/[-_.\s]+/)
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(' ') ??
+  'Challenge';
+
+const githubPathUrl = (mode: 'blob' | 'tree', relativePath: string) =>
+  `${GITHUB_REPOSITORY_URL}/${mode}/main/${relativePath
+    .replaceAll('\\', '/')
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/')}`;
 
 const titleFromMarkdown = (body: string) => body.match(/^#\s+(.+)$/m)?.[1]?.trim();
 
@@ -104,9 +155,11 @@ const summaryFromMarkdown = (body: string) => {
   return paragraph ? stripMarkdown(paragraph) : undefined;
 };
 
-const inferTopics = (folder: string, body: string) => {
+const inferTopics = (folder: string, body: string, documentType: CatalogItem['documentType']) => {
   const topics = new Set<string>([DEFAULT_TOPIC]);
   const searchable = `${folder} ${body}`.toLowerCase();
+
+  topics.add(documentType);
 
   if (searchable.includes('google') || searchable.includes('hashcode') || searchable.includes('code jam')) {
     topics.add('google');
@@ -130,6 +183,13 @@ const inferTopics = (folder: string, body: string) => {
 const detectLanguages = async (folder: string) => {
   const counts = new Map<string, number>();
   const itemPath = path.join(process.cwd(), CONTENT_DIR, folder);
+
+  try {
+    const stats = await fs.stat(itemPath);
+    if (!stats.isDirectory()) return [];
+  } catch {
+    return [];
+  }
 
   const visit = async (directory: string) => {
     const children = await fs.readdir(directory, { withFileTypes: true });
@@ -162,26 +222,35 @@ const detectLanguages = async (folder: string) => {
 };
 
 export const getCatalogItemFromEntry = async (entry: CatalogEntry): Promise<CatalogItem> => {
-  const folder = getCatalogFolder(entry.id);
+  const entryPath = getContentRelativePath(entry);
+  const folder = getCatalogFolderFromPath(entryPath);
+  const slug = getCatalogSlug(entry.id);
   const body = readEntryBody(entry);
-  const title = entry.data.title ?? titleFromMarkdown(body) ?? titleFromSlug(folder);
+  const documentType =
+    entry.data.documentType ?? (entry.data.pdfUrl ? 'pdf' : isReadmePath(entryPath) ? 'readme' : 'subject');
+  const repositoryPath = `${CONTENT_DIR}/${folder}`;
+  const title = entry.data.title ?? titleFromMarkdown(body) ?? titleFromSlug(slug);
   const summary = entry.data.summary ?? summaryFromMarkdown(body) ?? `${title} challenge.`;
   const languages = entry.data.languages ?? (await detectLanguages(folder));
-  const topics = entry.data.topics ?? inferTopics(folder, body);
+  const topics = entry.data.topics ?? inferTopics(folder, body, documentType);
 
   return {
     id: entry.id,
     folder,
-    slug: folder,
-    href: getPermalink(`/${ROUTE_PATH}/${folder}`),
+    slug,
+    href: getPermalink(`/${ROUTE_PATH}/${slug}`),
     title,
     summary,
     languages,
     topics,
-    readmePath: `${CONTENT_DIR}/${folder}/README.md`,
-    repositoryPath: `${CONTENT_DIR}/${folder}`,
-    repositoryUrl: `https://github.com/evilz/${REPOSITORY_NAME}/tree/main/${CONTENT_DIR}/${folder}`,
+    documentType,
+    documentPath: entryPath,
+    documentUrl: githubPathUrl('blob', entryPath),
+    readmePath: entryPath,
+    repositoryPath,
+    repositoryUrl: githubPathUrl('tree', repositoryPath),
     sourceUrl: entry.data.sourceUrl,
+    pdfUrl: entry.data.pdfUrl,
   };
 };
 
