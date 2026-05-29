@@ -26,7 +26,9 @@ const mustNotExist = async (relativePath) => {
     await access(filePath, constants.F_OK);
     throw new Error(`Unexpected generated route: ${relativePath}`);
   } catch (error) {
-    if (error?.code !== 'ENOENT') throw error;
+    if (error?.code !== 'ENOENT') {
+      throw new Error(`Failed verifying missing route "${relativePath}"`, { cause: error });
+    }
   }
 };
 

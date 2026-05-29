@@ -34,7 +34,7 @@ const groupedSections = isGroupedPage
         return {
           sectionItem,
           SectionContent,
-          sectionId: `${index + 1}-${cleanSlug(sectionItem.title) || sectionItem.slug.split('/').at(-1) || `section-${index + 1}`}`,
+          sectionId: `${index + 1}-${cleanSlug(sectionItem.title) || sectionItem.slug.split('/').at(-1)}`,
         };
       })
     )

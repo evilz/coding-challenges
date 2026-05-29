@@ -44,7 +44,7 @@ const REPOSITORY_NAME = 'coding-challenges';
 const DEFAULT_TOPIC = 'challenge';
 const GITHUB_REPOSITORY_URL = `https://github.com/evilz/${REPOSITORY_NAME}`;
 const ISOGRAD_ROOT = `${CONTENT_DIR}/isograd-tosa`;
-const NATURAL_SORT = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+const NATURAL_SORT = new Intl.Collator('en-US', { numeric: true, sensitivity: 'base' });
 
 const TITLE_OVERRIDES: Record<string, string> = {};
 
@@ -181,26 +181,26 @@ const getCatalogSlugSource = (id: string) => {
 
 export const getCatalogSlug = (id: string) => cleanSlug(getCatalogSlugSource(id));
 
-const titleFromSlug = (slug: string) =>
-  TITLE_OVERRIDES[slug] ??
-  slug
-    .split('/')
-    .filter(Boolean)
-    .at(-1)
-    ?.split(/[-_.\s]+/)
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ') ??
-  'Challenge';
-
-const titleFromFolderName = (folder: string) =>
-  folder
-    .replaceAll(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replaceAll(/[-_.]+/g, ' ')
-    .split(/\s+/)
+const toDisplayTitle = (value: string) =>
+  value
+    .split(/[-_.\s]+/)
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+
+const titleFromSlug = (slug: string) => {
+  const lastSlugSegment = slug.split('/').filter(Boolean).at(-1);
+
+  return TITLE_OVERRIDES[slug] ?? (lastSlugSegment ? toDisplayTitle(lastSlugSegment) : 'Challenge');
+};
+
+const titleFromFolderName = (folder: string) =>
+  toDisplayTitle(
+    folder
+      .replaceAll(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replaceAll(/[-_.]+/g, ' ')
+      .trim()
+  ) || 'Challenge';
 
 const githubPathUrl = (mode: 'blob' | 'tree', relativePath: string) =>
   `${GITHUB_REPOSITORY_URL}/${mode}/main/${relativePath
@@ -357,14 +357,22 @@ const getIsogradContestFoldersToGroup = (entries: CatalogEntry[]) => {
     groupedEntries.set(contestFolder, (groupedEntries.get(contestFolder) ?? 0) + 1);
   });
 
-  return new Set(Array.from(groupedEntries.entries()).flatMap(([folder, count]) => (count > 1 ? [folder] : [])));
+  return new Set(
+    Array.from(groupedEntries.entries())
+      .filter(([, count]) => count > 1)
+      .map(([folder]) => folder)
+  );
+};
+
+const toIsogradGroupSortPath = (folder: string, entry: CatalogEntry) => {
+  const prefix = `${ISOGRAD_ROOT}/${folder}/`;
+  return stripMarkdownExtension(getContentRelativePath(entry).replace(prefix, '')).replace(/\/readme$/i, '');
 };
 
 const sortIsogradGroupEntries = (folder: string, entries: CatalogEntry[]) =>
   [...entries].sort((a, b) => {
-    const prefix = `${ISOGRAD_ROOT}/${folder}/`;
-    const aPath = stripMarkdownExtension(getContentRelativePath(a).replace(prefix, '')).replace(/\/readme$/i, '');
-    const bPath = stripMarkdownExtension(getContentRelativePath(b).replace(prefix, '')).replace(/\/readme$/i, '');
+    const aPath = toIsogradGroupSortPath(folder, a);
+    const bPath = toIsogradGroupSortPath(folder, b);
 
     return NATURAL_SORT.compare(aPath, bPath);
   });
