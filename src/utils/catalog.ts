@@ -26,11 +26,25 @@ export type CatalogItem = {
   pdfUrl?: string;
 };
 
+export type CatalogPage =
+  | {
+      type: 'single';
+      item: CatalogItem;
+      entry: CatalogEntry;
+    }
+  | {
+      type: 'group';
+      item: CatalogItem;
+      entries: CatalogEntry[];
+    };
+
 const CONTENT_DIR = 'challenges';
 const ROUTE_PATH = 'challenges';
 const REPOSITORY_NAME = 'coding-challenges';
 const DEFAULT_TOPIC = 'challenge';
 const GITHUB_REPOSITORY_URL = `https://github.com/evilz/${REPOSITORY_NAME}`;
+const ISOGRAD_ROOT = `${CONTENT_DIR}/isograd-tosa`;
+const NATURAL_SORT = new Intl.Collator('en-US', { numeric: true, sensitivity: 'base' });
 
 const TITLE_OVERRIDES: Record<string, string> = {};
 
@@ -129,6 +143,36 @@ const getCatalogFolderFromPath = (entryPath: string) => {
 
 export const getCatalogFolder = (id: string) => pathDirectory(getEntryPathWithoutExtension(id));
 
+const getAllChallengeEntries = () => getCollection('challenge');
+
+const isIsogradPath = (entryPath: string) => entryPath.startsWith(`${ISOGRAD_ROOT}/`);
+
+const getIsogradContestFolder = (entryPath: string) => {
+  if (!isIsogradPath(entryPath)) return undefined;
+
+  const relativePath = entryPath.slice(`${ISOGRAD_ROOT}/`.length);
+  const [folder] = relativePath.split('/');
+
+  return folder || undefined;
+};
+
+const isIsogradContestRootReadme = (entryPath: string) => {
+  const contestFolder = getIsogradContestFolder(entryPath);
+  if (!contestFolder) return false;
+
+  const relativePath = entryPath.slice(`${ISOGRAD_ROOT}/${contestFolder}/`.length);
+  const withoutExtension = stripMarkdownExtension(relativePath);
+
+  return !withoutExtension.includes('/') && withoutExtension.toLowerCase() === 'readme';
+};
+
+const isGroupedIsogradSubjectPath = (entryPath: string, groupedFolders: Set<string>) => {
+  const contestFolder = getIsogradContestFolder(entryPath);
+  if (!contestFolder || !groupedFolders.has(contestFolder)) return false;
+
+  return !isIsogradContestRootReadme(entryPath);
+};
+
 const getCatalogSlugSource = (id: string) => {
   const withoutExtension = getEntryPathWithoutExtension(id);
 
@@ -137,17 +181,26 @@ const getCatalogSlugSource = (id: string) => {
 
 export const getCatalogSlug = (id: string) => cleanSlug(getCatalogSlugSource(id));
 
-const titleFromSlug = (slug: string) =>
-  TITLE_OVERRIDES[slug] ??
-  slug
-    .split('/')
-    .filter(Boolean)
-    .at(-1)
-    ?.split(/[-_.\s]+/)
+const toDisplayTitle = (value: string) =>
+  value
+    .split(/[-_.\s]+/)
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ') ??
-  'Challenge';
+    .join(' ');
+
+const titleFromSlug = (slug: string) => {
+  const lastSlugSegment = slug.split('/').filter(Boolean).at(-1);
+
+  return TITLE_OVERRIDES[slug] ?? (lastSlugSegment ? toDisplayTitle(lastSlugSegment) : 'Challenge');
+};
+
+const titleFromFolderName = (folder: string) =>
+  toDisplayTitle(
+    folder
+      .replaceAll(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replaceAll(/[-_.]+/g, ' ')
+      .trim()
+  ) || 'Challenge';
 
 const githubPathUrl = (mode: 'blob' | 'tree', relativePath: string) =>
   `${GITHUB_REPOSITORY_URL}/${mode}/main/${relativePath
@@ -275,14 +328,123 @@ export const getCatalogItemFromEntry = async (entry: CatalogEntry): Promise<Cata
 };
 
 export const fetchCatalogItems = async (): Promise<CatalogItem[]> => {
-  const entries = await getCatalogEntries();
-  const items = await Promise.all(entries.map((entry) => getCatalogItemFromEntry(entry)));
+  const pages = await getCatalogPages();
 
-  return items.sort((a, b) => a.title.localeCompare(b.title));
+  return pages.map((page) => page.item);
 };
 
 export const getCatalogEntries = async (): Promise<CatalogEntry[]> => {
-  const entries = await getCollection('challenge');
+  const entries = await getAllChallengeEntries();
+  const groupedFolders = getIsogradContestFoldersToGroup(entries);
 
-  return entries.filter(isCatalogDocument);
+  return entries.filter((entry) => {
+    const entryPath = getContentRelativePath(entry);
+    if (isGroupedIsogradSubjectPath(entryPath, groupedFolders)) return false;
+
+    return isCatalogDocument(entry);
+  });
+};
+
+const getIsogradContestFoldersToGroup = (entries: CatalogEntry[]) => {
+  const groupedEntries = new Map<string, number>();
+
+  entries.forEach((entry) => {
+    const entryPath = getContentRelativePath(entry);
+    const contestFolder = getIsogradContestFolder(entryPath);
+
+    if (!contestFolder || isIsogradContestRootReadme(entryPath) || !isCatalogDocument(entry)) return;
+
+    groupedEntries.set(contestFolder, (groupedEntries.get(contestFolder) ?? 0) + 1);
+  });
+
+  return new Set(
+    Array.from(groupedEntries.entries())
+      .filter(([, count]) => count > 1)
+      .map(([folder]) => folder)
+  );
+};
+
+const toIsogradGroupSortPath = (folder: string, entry: CatalogEntry) => {
+  const prefix = `${ISOGRAD_ROOT}/${folder}/`;
+  return stripMarkdownExtension(getContentRelativePath(entry).replace(prefix, '')).replace(/\/readme$/i, '');
+};
+
+const sortIsogradGroupEntries = (folder: string, entries: CatalogEntry[]) =>
+  [...entries].sort((a, b) => {
+    const aPath = toIsogradGroupSortPath(folder, a);
+    const bPath = toIsogradGroupSortPath(folder, b);
+
+    return NATURAL_SORT.compare(aPath, bPath);
+  });
+
+const getIsogradGroupPage = async (folder: string, entries: CatalogEntry[]): Promise<CatalogPage> => {
+  const groupEntries = sortIsogradGroupEntries(
+    folder,
+    entries.filter((entry) => {
+      const entryPath = getContentRelativePath(entry);
+      return (
+        getIsogradContestFolder(entryPath) === folder &&
+        !isIsogradContestRootReadme(entryPath) &&
+        isCatalogDocument(entry)
+      );
+    })
+  );
+  const rootReadme = entries.find((entry) => {
+    const entryPath = getContentRelativePath(entry);
+    return getIsogradContestFolder(entryPath) === folder && isIsogradContestRootReadme(entryPath);
+  });
+  const rootReadmePath = rootReadme ? getContentRelativePath(rootReadme) : undefined;
+  const childItems = await Promise.all(groupEntries.map((entry) => getCatalogItemFromEntry(entry)));
+  const slug = cleanSlug(`isograd-tosa/${folder}`);
+  const title = rootReadme
+    ? (titleFromMarkdown(readEntryBody(rootReadme)) ?? titleFromFolderName(folder))
+    : titleFromFolderName(folder);
+  const summary =
+    (rootReadme ? summaryFromMarkdown(readEntryBody(rootReadme)) : undefined) ??
+    childItems[0]?.summary ??
+    `${title} challenge collection.`;
+  const languages = await detectLanguages(`isograd-tosa/${folder}`);
+  const topics = Array.from(new Set([DEFAULT_TOPIC, 'isograd', ...childItems.flatMap((item) => item.topics)])).sort();
+  const repositoryPath = `${CONTENT_DIR}/isograd-tosa/${folder}`;
+
+  return {
+    type: 'group',
+    item: {
+      id: `isograd-tosa/${folder}`,
+      folder: `isograd-tosa/${folder}`,
+      slug,
+      href: getPermalink(`/${ROUTE_PATH}/${slug}`),
+      title,
+      summary,
+      languages,
+      topics,
+      documentType: 'subject',
+      documentPath: rootReadmePath ?? repositoryPath,
+      documentUrl: rootReadmePath ? githubPathUrl('blob', rootReadmePath) : githubPathUrl('tree', repositoryPath),
+      readmePath: rootReadmePath ?? repositoryPath,
+      repositoryPath,
+      repositoryUrl: githubPathUrl('tree', repositoryPath),
+    },
+    entries: groupEntries,
+  };
+};
+
+export const getCatalogPages = async (): Promise<CatalogPage[]> => {
+  const entries = await getAllChallengeEntries();
+  const groupedFolders = getIsogradContestFoldersToGroup(entries);
+  const catalogEntries = await getCatalogEntries();
+  const singlePages = await Promise.all(
+    catalogEntries.map(async (entry) => ({
+      type: 'single' as const,
+      item: await getCatalogItemFromEntry(entry),
+      entry,
+    }))
+  );
+  const groupedPages = await Promise.all(
+    Array.from(groupedFolders)
+      .sort((a, b) => NATURAL_SORT.compare(a, b))
+      .map((folder) => getIsogradGroupPage(folder, entries))
+  );
+
+  return [...singlePages, ...groupedPages].sort((a, b) => a.item.title.localeCompare(b.item.title));
 };
