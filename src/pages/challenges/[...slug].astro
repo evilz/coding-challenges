@@ -1,29 +1,44 @@
 ---
 import { render } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 
 import Layout from '~/layouts/PageLayout.astro';
 import Button from '~/components/ui/Button.astro';
-import { getCatalogEntries, getCatalogItemFromEntry, getCatalogSlug } from '~/utils/catalog';
-import { getPermalink } from '~/utils/permalinks';
+import { getCatalogItemFromEntry, getCatalogPages } from '~/utils/catalog';
+import type { CatalogPage } from '~/utils/catalog';
+import { cleanSlug, getPermalink } from '~/utils/permalinks';
 
 export async function getStaticPaths() {
-  const entries = await getCatalogEntries();
+  const pages = await getCatalogPages();
 
-  return entries.map((entry) => ({
-    params: { slug: getCatalogSlug(entry.id) },
-    props: { entry },
+  return pages.map((page) => ({
+    params: { slug: page.item.slug },
+    props: { page },
   }));
 }
 
 interface Props {
-  entry: CollectionEntry<'challenge'>;
+  page: CatalogPage;
 }
 
-const { entry } = Astro.props as Props;
-const { Content } = await render(entry);
-const item = await getCatalogItemFromEntry(entry);
+const { page } = Astro.props as Props;
+const item = page.item;
+const isGroupedPage = page.type === 'group';
+const { Content } = isGroupedPage ? { Content: undefined } : await render(page.entry);
+const groupedSections = isGroupedPage
+  ? await Promise.all(
+      page.entries.map(async (entry, index) => {
+        const { Content: SectionContent } = await render(entry);
+        const sectionItem = await getCatalogItemFromEntry(entry);
+
+        return {
+          sectionItem,
+          SectionContent,
+          sectionId: `${index + 1}-${cleanSlug(sectionItem.title) || sectionItem.slug.split('/').at(-1) || `section-${index + 1}`}`,
+        };
+      })
+    )
+  : [];
 
 const metadata = {
   title: item.title,
@@ -56,7 +71,39 @@ const metadata = {
 
     <div class="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:px-8">
       <div class="prose prose-slate max-w-none dark:prose-invert">
-        <Content />
+        {
+          isGroupedPage ? (
+            <>
+              <nav class="not-prose mb-10 rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900">
+                <h2 class="text-sm font-semibold uppercase tracking-normal text-slate-500 dark:text-slate-400">Subjects</h2>
+                <ol class="mt-4 list-decimal space-y-2 pl-5">
+                  {groupedSections.map(({ sectionId, sectionItem }) => (
+                    <li>
+                      <a class="font-medium text-blue-700 hover:underline dark:text-blue-300" href={`#${sectionId}`}>
+                        {sectionItem.title}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+              {groupedSections.map(({ sectionId, sectionItem, SectionContent }) => (
+                <section id={sectionId} class="mb-14 scroll-mt-24">
+                  <h2>{sectionItem.title}</h2>
+                  <div class="not-prose mt-3 flex flex-wrap gap-2">
+                    <Button href={sectionItem.documentUrl} target="_blank" text="Source markdown" icon="tabler:file-text" />
+                    {sectionItem.pdfUrl && <Button href={sectionItem.pdfUrl} target="_blank" text="Original PDF" icon="tabler:file-type-pdf" />}
+                    {sectionItem.sourceUrl && <Button href={sectionItem.sourceUrl} target="_blank" text="Source repository" icon="tabler:brand-github" />}
+                  </div>
+                  <div class="mt-6">
+                    <SectionContent />
+                  </div>
+                </section>
+              ))}
+            </>
+          ) : (
+            Content && <Content />
+          )
+        }
       </div>
 
       <aside class="h-fit rounded-lg border border-slate-200 p-5 dark:border-slate-800">
@@ -64,8 +111,14 @@ const metadata = {
         <dl class="mt-5 grid gap-4 text-sm">
           <div>
             <dt class="text-slate-500 dark:text-slate-400">Type</dt>
-            <dd class="mt-1 font-medium capitalize text-slate-950 dark:text-white">{item.documentType}</dd>
+            <dd class="mt-1 font-medium capitalize text-slate-950 dark:text-white">{isGroupedPage ? 'group' : item.documentType}</dd>
           </div>
+          {isGroupedPage && (
+            <div>
+              <dt class="text-slate-500 dark:text-slate-400">Subjects</dt>
+              <dd class="mt-1 font-medium text-slate-950 dark:text-white">{groupedSections.length}</dd>
+            </div>
+          )}
           <div>
             <dt class="text-slate-500 dark:text-slate-400">Document</dt>
             <dd class="mt-1 font-mono text-xs font-medium text-slate-950 dark:text-white">{item.documentPath}</dd>
