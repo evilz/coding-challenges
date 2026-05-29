@@ -352,7 +352,7 @@ const getIsogradContestFoldersToGroup = (entries: CatalogEntry[]) => {
     const entryPath = getContentRelativePath(entry);
     const contestFolder = getIsogradContestFolder(entryPath);
 
-    if (!contestFolder || isIsogradContestRootReadme(entryPath)) return;
+    if (!contestFolder || isIsogradContestRootReadme(entryPath) || !isCatalogDocument(entry)) return;
 
     groupedEntries.set(contestFolder, (groupedEntries.get(contestFolder) ?? 0) + 1);
   });
@@ -382,7 +382,11 @@ const getIsogradGroupPage = async (folder: string, entries: CatalogEntry[]): Pro
     folder,
     entries.filter((entry) => {
       const entryPath = getContentRelativePath(entry);
-      return getIsogradContestFolder(entryPath) === folder && !isIsogradContestRootReadme(entryPath);
+      return (
+        getIsogradContestFolder(entryPath) === folder &&
+        !isIsogradContestRootReadme(entryPath) &&
+        isCatalogDocument(entry)
+      );
     })
   );
   const rootReadme = entries.find((entry) => {
